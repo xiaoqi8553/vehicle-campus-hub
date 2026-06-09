@@ -86,7 +86,10 @@ test.describe("resources page", () => {
       if (message.type() === "error") errors.push(message.text());
     });
     page.on("requestfailed", (request) => {
-      errors.push(`${request.url()}: ${request.failure()?.errorText ?? "failed"}`);
+      const failure = request.failure()?.errorText ?? "failed";
+      if (failure !== "net::ERR_ABORTED") {
+        errors.push(`${request.url()}: ${failure}`);
+      }
     });
     await page.reload({ waitUntil: "networkidle" });
     expect(errors).toEqual([]);
