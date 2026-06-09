@@ -2,6 +2,10 @@
 
 车辆行业校招信息汇总平台，面向车辆、机械、自动驾驶、嵌入式、三电与新能源方向学生。项目聚合企业、校招项目、岗位、资料和日历事件，并提供可供后续微信小程序或 App 复用的 REST API。
 
+在线演示：[https://vehicle-campus-hub.vercel.app](https://vehicle-campus-hub.vercel.app)
+
+GitHub 仓库：[https://github.com/xiaoqi8553/vehicle-campus-hub](https://github.com/xiaoqi8553/vehicle-campus-hub)
+
 > 本平台信息为聚合整理，具体以企业官方招聘网站为准。当前 seed 数据用于产品演示，不代表实时招聘状态。
 
 ## 项目亮点

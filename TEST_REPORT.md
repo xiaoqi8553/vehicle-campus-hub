@@ -2,6 +2,8 @@
 
 测试日期：2026-06-09
 
+生产部署：[https://vehicle-campus-hub.vercel.app](https://vehicle-campus-hub.vercel.app)
+
 ## 最终结果
 
 | 检查项 | 结果 |
