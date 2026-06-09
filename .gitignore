@@ -1,0 +1,7 @@
+node_modules
+.next
+test-results
+playwright-report
+prisma/dev.db-journal
+.env
+*.log

@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id             String          @id @default(cuid())
+  name           String          @unique
+  logo           String?
+  category       String
+  description    String
+  officialWebsite String?
+  campusUrl      String?
+  cities         String          @default("[]")
+  tags           String          @default("[]")
+  status         String          @default("待确认")
+  fitDirections  String          @default("[]")
+  lastUpdatedAt  DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  recruitments   Recruitment[]
+  jobs           Job[]
+  resources      Resource[]
+  calendarEvents CalendarEvent[]
+  favorites      Favorite[]
+}
+
+model Recruitment {
+  id             String          @id @default(cuid())
+  companyId      String
+  year           Int
+  season         String
+  title          String
+  status         String
+  startDate      DateTime?
+  endDate        DateTime?
+  applyUrl       String?
+  process        String
+  note           String?
+  sourceUrl      String?
+  credibility    String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  jobs           Job[]
+  calendarEvents CalendarEvent[]
+
+  @@index([companyId])
+}
+
+model Job {
+  id               String       @id @default(cuid())
+  companyId        String
+  recruitmentId    String?
+  title            String
+  direction        String
+  city             String
+  education        String
+  majorRequirement String
+  applyUrl         String?
+  vehicleFitScore  Int
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  company          Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  recruitment      Recruitment? @relation(fields: [recruitmentId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([recruitmentId])
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  companyId   String
+  title       String
+  type        String
+  url         String?
+  source      String
+  summary     String
+  credibility String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  nickname  String?
+  role      String     @default("USER")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  favorites Favorite[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+}
+
+model CalendarEvent {
+  id            String       @id @default(cuid())
+  companyId     String
+  recruitmentId String?
+  title         String
+  eventType     String
+  eventDate     DateTime
+  status        String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  company       Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  recruitment   Recruitment? @relation(fields: [recruitmentId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([recruitmentId])
+  @@index([eventDate])
+}
