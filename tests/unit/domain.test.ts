@@ -4,6 +4,7 @@ import {
   fitScoreLevel,
   generateVehicleAdvice,
   parseStringList,
+  safeExternalUrl,
   stringifyStringList,
 } from "@/lib/domain";
 
@@ -75,5 +76,18 @@ describe("generateVehicleAdvice", () => {
     expect(advice).toContain("Python");
     expect(advice).toContain("CAN");
     expect(new Set(advice).size).toBe(advice.length);
+  });
+});
+
+describe("safeExternalUrl", () => {
+  it("accepts real http links and rejects placeholders or unsafe values", () => {
+    expect(safeExternalUrl("https://careers.example.org/campus")).toBe(
+      "https://careers.example.org/campus",
+    );
+    expect(safeExternalUrl("https://example.com/demo")).toBeNull();
+    expect(safeExternalUrl("https://www.example.com/demo")).toBeNull();
+    expect(safeExternalUrl("#")).toBeNull();
+    expect(safeExternalUrl("javascript:alert(1)")).toBeNull();
+    expect(safeExternalUrl("")).toBeNull();
   });
 });

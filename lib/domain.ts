@@ -88,7 +88,16 @@ export function safeExternalUrl(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try {
     const parsed = new URL(url);
-    return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString() : null;
+    const hostname = parsed.hostname.toLowerCase();
+    const isPlaceholder =
+      hostname === "example.com" ||
+      hostname.endsWith(".example.com") ||
+      hostname === "localhost" ||
+      hostname === "0.0.0.0" ||
+      hostname === "127.0.0.1";
+    return ["http:", "https:"].includes(parsed.protocol) && !isPlaceholder
+      ? parsed.toString()
+      : null;
   } catch {
     return null;
   }
