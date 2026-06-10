@@ -6,7 +6,20 @@ import { StatusBadge } from "@/components/ui/status-badge";
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "待确认";
-  return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" }).format(new Date(value));
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "UTC",
+  }).format(new Date(value));
+}
+
+function formatFullDate(value: string) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "UTC",
+  }).format(new Date(value));
 }
 
 export function CompanyCard({ company }: { company: CompanyCardData }) {
@@ -35,7 +48,7 @@ export function CompanyCard({ company }: { company: CompanyCardData }) {
       <div>
         <p className="mini-label">2027届信息状态</p>
         <p className="direction-copy">
-          {program?.credibility ?? "待核实"} · {program?.sourceType ?? "公开整理"} · 更新于 {new Date(company.lastUpdatedAt).toLocaleDateString("zh-CN")}
+          {program?.credibility ?? "待核实"} · {program?.sourceType ?? "公开整理"} · 更新于 {formatFullDate(company.lastUpdatedAt)}
         </p>
       </div>
       <div className="company-actions">
