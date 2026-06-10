@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("resources page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/resources");
-    await expect(page.getByRole("heading", { name: "笔试面经" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "2027届车辆行业笔试面经资料库" })).toBeVisible();
   });
 
   test("opens with resource cards, statistics and no residual loading state", async ({
@@ -11,7 +11,7 @@ test.describe("resources page", () => {
   }) => {
     expect(await page.getByTestId("resource-card").count()).toBeGreaterThan(0);
     await expect(page.getByTestId("resource-stats")).toBeVisible();
-    await expect(page.getByText("示例数据，具体以企业官方信息为准")).toBeVisible();
+    await expect(page.getByText("2027届资料库仍在补链接，具体以企业官方信息为准")).toBeVisible();
     await expect(page.getByText("正在加载校招数据...")).toHaveCount(0);
   });
 
@@ -62,7 +62,7 @@ test.describe("resources page", () => {
     page,
   }) => {
     await expect(page.locator('a[href*="example.com"]')).toHaveCount(0);
-    await expect(page.getByText("暂无外部链接").first()).toBeVisible();
+    await expect(page.getByText("暂无链接，待补充").first()).toBeVisible();
   });
 
   test("a verified official resource opens its external destination", async ({
@@ -112,7 +112,7 @@ test("resource page has no horizontal overflow at required viewports", async ({
     });
     const page = await context.newPage();
     await page.goto("/resources");
-    await expect(page.getByRole("heading", { name: "笔试面经" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "2027届车辆行业笔试面经资料库" })).toBeVisible();
     const dimensions = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,
       content: document.documentElement.scrollWidth,

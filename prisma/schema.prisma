@@ -8,32 +8,41 @@ datasource db {
 }
 
 model Company {
-  id             String          @id @default(cuid())
-  name           String          @unique
-  logo           String?
-  category       String
-  description    String
-  officialWebsite String?
-  campusUrl      String?
-  cities         String          @default("[]")
-  tags           String          @default("[]")
-  status         String          @default("待确认")
-  fitDirections  String          @default("[]")
-  lastUpdatedAt  DateTime        @default(now())
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  recruitments   Recruitment[]
-  jobs           Job[]
-  resources      Resource[]
-  calendarEvents CalendarEvent[]
-  favorites      Favorite[]
+  id                       String          @id @default(cuid())
+  slug                     String?         @unique
+  name                     String          @unique
+  shortName                String?
+  type                     String?
+  logo                     String?
+  category                 String
+  description              String
+  officialWebsite          String?
+  campusRecruitmentWebsite String?
+  campusUrl                String?
+  cities                   String          @default("[]")
+  tags                     String          @default("[]")
+  vehicleDirections        String          @default("[]")
+  fitDirections            String          @default("[]")
+  status                   String          @default("待确认")
+  dataStatus               String          @default("待核实")
+  lastVerifiedAt           DateTime?
+  lastUpdatedAt            DateTime        @default(now())
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+  recruitments             Recruitment[]
+  jobs                     Job[]
+  resources                Resource[]
+  calendarEvents           CalendarEvent[]
+  favorites                Favorite[]
 }
 
 model Recruitment {
   id             String          @id @default(cuid())
   companyId      String
   year           Int
+  targetYear     Int?
   season         String
+  batch          String?
   title          String
   status         String
   startDate      DateTime?
@@ -41,7 +50,9 @@ model Recruitment {
   applyUrl       String?
   process        String
   note           String?
+  notes          String?
   sourceUrl      String?
+  sourceType     String?
   credibility    String
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -56,13 +67,17 @@ model Job {
   id               String       @id @default(cuid())
   companyId        String
   recruitmentId    String?
+  programId        String?
   title            String
   direction        String
   city             String
   education        String
   majorRequirement String
+  majors           String       @default("[]")
+  skills           String       @default("[]")
   applyUrl         String?
   vehicleFitScore  Int
+  matchScore       Int?
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   company          Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -73,17 +88,23 @@ model Job {
 }
 
 model Resource {
-  id          String   @id @default(cuid())
-  companyId   String
-  title       String
-  type        String
-  url         String?
-  source      String
-  summary     String
-  credibility String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  companyId      String
+  title          String
+  type           String
+  targetYear     Int?
+  sourceYear     Int?
+  url            String?
+  sourceUrl      String?
+  source         String
+  sourceType     String?
+  summary        String
+  credibility    String
+  tags           String    @default("[]")
+  lastVerifiedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
@@ -114,10 +135,13 @@ model CalendarEvent {
   id            String       @id @default(cuid())
   companyId     String
   recruitmentId String?
+  programId     String?
   title         String
   eventType     String
   eventDate     DateTime
   status        String
+  sourceUrl     String?
+  credibility   String       @default("待核实")
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   company       Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)

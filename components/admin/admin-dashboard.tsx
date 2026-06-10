@@ -2,9 +2,10 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BriefcaseBusiness, Building2, CalendarRange, FileText, Plus } from "lucide-react";
-import type { CompanyCardData, JobData, RecruitmentData, ResourceData } from "@/lib/data";
+import { BriefcaseBusiness, Building2, CalendarClock, CalendarRange, FileText, Plus } from "lucide-react";
+import type { CalendarEventData, CompanyCardData, JobData, RecruitmentData, ResourceData } from "@/lib/data";
 import {
+  CALENDAR_EVENT_TYPES,
   COMPANY_CATEGORIES,
   CREDIBILITY_LEVELS,
   JOB_DIRECTIONS,
@@ -18,6 +19,7 @@ type AdminProps = {
     recruitments: Array<RecruitmentData & { companyName: string }>;
     jobs: Array<JobData & { companyName: string }>;
     resources: Array<ResourceData & { companyName: string }>;
+    calendarEvents: Array<CalendarEventData & { companyName: string }>;
   };
 };
 
@@ -26,6 +28,7 @@ const sections = [
   { id: "recruitments", label: "校招项目管理", icon: CalendarRange },
   { id: "jobs", label: "岗位管理", icon: BriefcaseBusiness },
   { id: "resources", label: "资料管理", icon: FileText },
+  { id: "calendarEvents", label: "日历事件管理", icon: CalendarClock },
 ] as const;
 
 export function AdminDashboard({ data }: AdminProps) {
@@ -207,6 +210,25 @@ export function AdminDashboard({ data }: AdminProps) {
             />
           </>
         )}
+
+        {active === "calendarEvents" && (
+          <>
+            <AdminForm title="新增日历事件" onSubmit={(event) => submit(event, "/api/calendar-events")} pending={pending}>
+              <CompanySelect companies={data.companies} />
+              <select name="eventType" required>{CALENDAR_EVENT_TYPES.map((item) => <option key={item}>{item}</option>)}</select>
+              <input name="title" placeholder="事件标题 *" required />
+              <input name="eventDate" type="date" required />
+              <select name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
+              <select name="credibility" required defaultValue="待核实">{CREDIBILITY_LEVELS.map((item) => <option key={item}>{item}</option>)}</select>
+              <input name="sourceUrl" placeholder="来源链接（可空）" />
+            </AdminForm>
+            <CalendarEventEditor
+              items={data.calendarEvents.slice(0, 12)}
+              pending={pending}
+              onUpdate={(id, body) => updateRecord("/api/calendar-events", id, body)}
+            />
+          </>
+        )}
       </div>
     </div>
   );
@@ -382,5 +404,37 @@ function ResourceEditorRow({ item, pending, onUpdate }: {
     <td><select value={credibility} onChange={(event) => setCredibility(event.target.value)}>{CREDIBILITY_LEVELS.map((value) => <option key={value}>{value}</option>)}</select></td>
     <td><input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="可空" /></td>
     <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { type, source, credibility, url })}>保存</button></td>
+  </tr>;
+}
+
+function CalendarEventEditor({ items, pending, onUpdate }: {
+  items: Array<CalendarEventData & { companyName: string }>;
+  pending: boolean;
+  onUpdate: UpdateHandler;
+}) {
+  return <div className="table-wrap"><table>
+    <thead><tr><th>公司 / 事件</th><th>类型</th><th>日期</th><th>状态</th><th>可信度</th><th>来源链接</th><th>操作</th></tr></thead>
+    <tbody>{items.map((item) => <CalendarEventEditorRow key={item.id} item={item} pending={pending} onUpdate={onUpdate} />)}</tbody>
+  </table></div>;
+}
+
+function CalendarEventEditorRow({ item, pending, onUpdate }: {
+  item: CalendarEventData & { companyName: string };
+  pending: boolean;
+  onUpdate: UpdateHandler;
+}) {
+  const [eventType, setEventType] = useState(item.eventType);
+  const [eventDate, setEventDate] = useState(item.eventDate.slice(0, 10));
+  const [status, setStatus] = useState(item.status);
+  const [credibility, setCredibility] = useState(item.credibility);
+  const [sourceUrl, setSourceUrl] = useState(item.sourceUrl ?? "");
+  return <tr>
+    <td><strong>{item.companyName}</strong><small>{item.title}</small></td>
+    <td><select value={eventType} onChange={(event) => setEventType(event.target.value)}>{CALENDAR_EVENT_TYPES.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} /></td>
+    <td><select value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><select value={credibility} onChange={(event) => setCredibility(event.target.value)}>{CREDIBILITY_LEVELS.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="可空" /></td>
+    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { eventType, eventDate, status, credibility, sourceUrl })}>保存</button></td>
   </tr>;
 }

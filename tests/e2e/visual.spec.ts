@@ -4,9 +4,10 @@ const pages = [
   { path: "/", name: "home" },
   { path: "/companies", name: "companies" },
   { path: "/companies/xiaomi-auto", name: "company-detail" },
+  { path: "/companies/byd", name: "company-byd" },
   { path: "/calendar", name: "calendar" },
   { path: "/resources", name: "resources" },
-  { path: "/admin", name: "admin" },
+  { path: "/about", name: "about" },
 ];
 
 for (const target of pages) {

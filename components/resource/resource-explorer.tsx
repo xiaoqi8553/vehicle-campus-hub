@@ -19,18 +19,23 @@ import { safeExternalUrl } from "@/lib/domain";
 type Item = ResourceData & { company: CompanyCardData };
 type SortMode = "recent" | "official" | "company";
 
+const RESOURCE_DIRECTIONS = [
+  "自动驾驶",
+  "嵌入式",
+  "底盘",
+  "整车研发",
+  "三电",
+  "电池",
+  "热管理",
+  "智能座舱",
+  "测试验证",
+];
+
 const credibilityTone: Record<string, string> = {
   官方: "official",
   较可信: "trusted",
   经验参考: "experience",
   待核实: "pending",
-};
-
-const credibilityCopy: Record<string, string> = {
-  官方: "企业官方渠道",
-  较可信: "公开来源整理",
-  经验参考: "候选人经验参考",
-  待核实: "来源仍需核验",
 };
 
 function formatDate(value: string) {
@@ -46,6 +51,7 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
   const [companyId, setCompanyId] = useState("");
   const [type, setType] = useState("");
   const [credibility, setCredibility] = useState("");
+  const [direction, setDirection] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("recent");
   const companies = useMemo(
     () => [...new Map(resources.map((item) => [item.company.id, item.company])).values()]
@@ -56,10 +62,11 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
     const keyword = query.trim().toLowerCase();
     return resources
       .filter((item) => (
-        (!keyword || `${item.title} ${item.summary} ${item.source} ${item.company.name}`.toLowerCase().includes(keyword))
+        (!keyword || `${item.title} ${item.summary} ${item.source} ${item.company.name} ${item.tags.join(" ")}`.toLowerCase().includes(keyword))
         && (!companyId || item.companyId === companyId)
         && (!type || item.type === type)
         && (!credibility || item.credibility === credibility)
+        && (!direction || `${item.title} ${item.summary} ${item.tags.join(" ")}`.includes(direction))
       ))
       .sort((a, b) => {
         if (sortMode === "company") {
@@ -77,7 +84,7 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
         }
         return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
       });
-  }, [companyId, credibility, query, resources, sortMode, type]);
+  }, [companyId, credibility, direction, query, resources, sortMode, type]);
 
   const officialCount = resources.filter((item) => item.credibility === "官方").length;
   const validLinkCount = resources.filter((item) => safeExternalUrl(item.url)).length;
@@ -85,13 +92,14 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
     (latest, item) => Date.parse(item.updatedAt) > Date.parse(latest) ? item.updatedAt : latest,
     resources[0]?.updatedAt ?? new Date(0).toISOString(),
   );
-  const hasFilters = Boolean(query || companyId || type || credibility);
+  const hasFilters = Boolean(query || companyId || type || credibility || direction);
 
   function clearFilters() {
     setQuery("");
     setCompanyId("");
     setType("");
     setCredibility("");
+    setDirection("");
   }
 
   return (
@@ -99,8 +107,8 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
       <div className="resource-notice" role="note">
         <ShieldCheck size={19} />
         <div>
-          <strong>示例数据，具体以企业官方信息为准</strong>
-          <p>官方入口仅保留已核验域名；经验资料不代表企业口径，使用前请再次确认时效。</p>
+          <strong>2027届资料库仍在补链接，具体以企业官方信息为准</strong>
+          <p>官方入口仅保留已核验域名；候选人经验用于准备参考，不代表企业题库或官方口径。</p>
         </div>
       </div>
 
@@ -112,6 +120,14 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
       </section>
 
       <div className="filter-panel resource-filters">
+        <div className="direction-tabs" aria-label="车辆方向资料分组">
+          <button className={!direction ? "active" : ""} type="button" onClick={() => setDirection("")}>全部方向</button>
+          {RESOURCE_DIRECTIONS.map((item) => (
+            <button className={direction === item ? "active" : ""} key={item} type="button" onClick={() => setDirection(item)}>
+              {item}
+            </button>
+          ))}
+        </div>
         <label className="search-field">
           <Search size={18} />
           <input
@@ -173,11 +189,14 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
             <h3>{item.title}</h3>
             <p className="resource-company">{item.company.name} · {item.source}</p>
             <p>{item.summary}</p>
+            <div className="tag-row">
+              {item.tags.slice(0, 4).map((tag) => <span className="tag" key={tag}>{tag}</span>)}
+            </div>
             <div className="resource-meta">
-              <span>{credibilityCopy[item.credibility] ?? credibilityCopy.待核实}</span>
+              <span>{item.targetYear}届 · 来源年份 {item.sourceYear} · {item.sourceType}</span>
               <time dateTime={item.updatedAt}>更新于 {formatDate(item.updatedAt)}</time>
             </div>
-            <ExternalLink href={item.url} emptyLabel="暂无外部链接">查看资料</ExternalLink>
+            <ExternalLink href={item.sourceUrl} emptyLabel="暂无链接，待补充">查看资料</ExternalLink>
           </article>
           );
         })}

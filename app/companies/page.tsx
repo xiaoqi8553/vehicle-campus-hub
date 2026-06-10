@@ -8,9 +8,9 @@ export default async function CompaniesPage() {
     return (
       <div className="shell page-space">
         <div className="page-heading">
-          <p className="eyebrow">COMPANY DATABASE / {companies.length} RECORDS</p>
-          <h1>公司库</h1>
-          <p>覆盖整车、零部件、自动驾驶、智能化供应商和电池三电企业，按求职决策所需信息统一整理。</p>
+          <p className="eyebrow">2027 COMPANY DATABASE / {companies.length} RECORDS</p>
+          <h1>2027届车辆行业公司库</h1>
+          <p>按公司类型、校招状态、车辆方向、城市、可信度和官方链接完整筛选。没有官方投递入口的企业会明确显示“待补官方链接”。</p>
         </div>
         <CompanyExplorer companies={companies} showSort />
       </div>

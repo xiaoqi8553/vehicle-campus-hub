@@ -1,21 +1,46 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenCheck, Building2, CalendarClock, RadioTower } from "lucide-react";
+import { AlertTriangle, ArrowRight, Building2, CalendarClock, ClipboardCheck, Link2, RadioTower, Sparkles } from "lucide-react";
 import { CompanyExplorer } from "@/components/company/company-explorer";
+import { CompanyCard } from "@/components/company/company-card";
 import { DataState } from "@/components/ui/data-state";
 import { getCompanies } from "@/lib/data";
-import { prisma } from "@/lib/prisma";
+import { safeExternalUrl } from "@/lib/domain";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export default async function HomePage() {
   try {
-    const [companies, resourceCount] = await Promise.all([
-      getCompanies(),
-      prisma.resource.count(),
-    ]);
+    const companies = await getCompanies();
+    const now = new Date();
+    const officialLinkCount = companies.filter((company) =>
+      safeExternalUrl(company.recruitments?.[0]?.applyUrl ?? company.campusRecruitmentWebsite),
+    ).length;
+    const activeCompanies = companies.filter((company) => company.recruitments?.[0]?.status === "已开启");
+    const closingSoon = companies.filter((company) => {
+      const endDate = company.recruitments?.[0]?.endDate;
+      if (!endDate) return false;
+      const daysLeft = Math.ceil((Date.parse(endDate) - now.getTime()) / DAY_MS);
+      return daysLeft >= 0 && daysLeft <= 7;
+    });
+    const missingLinks = companies.filter((company) =>
+      !safeExternalUrl(company.recruitments?.[0]?.applyUrl ?? company.campusRecruitmentWebsite),
+    );
     const stats = [
       { label: "已收录企业", value: companies.length, icon: Building2 },
-      { label: "校招已开启", value: companies.filter((item) => item.status === "已开启").length, icon: RadioTower },
-      { label: "即将截止", value: companies.filter((item) => item.status === "即将截止").length, icon: CalendarClock },
-      { label: "笔试面试资料", value: resourceCount, icon: BookOpenCheck },
+      { label: "已核验官方链接", value: officialLinkCount, icon: Link2 },
+      { label: "已开启校招", value: activeCompanies.length, icon: RadioTower },
+      { label: "7天内即将截止", value: closingSoon.length, icon: CalendarClock },
+      { label: "待补链接", value: missingLinks.length, icon: AlertTriangle },
+    ];
+    const focusGroups = [
+      { title: "正在投递", copy: "优先处理已开启且有官方入口的企业。", items: activeCompanies.slice(0, 3) },
+      { title: "即将截止", copy: "7 天内截止的节点需要单独提醒。", items: closingSoon.slice(0, 3) },
+      { title: "待确认但值得关注", copy: "有方向价值但缺少 2027 届官方链接，适合加入观察清单。", items: missingLinks.slice(0, 3) },
+    ];
+    const productSignals = [
+      { title: "校招日程", copy: "按 7 天截止、30 天截止、本月开启组织时间线。", href: "/calendar", icon: CalendarClock },
+      { title: "24h 更新视角", copy: "用最近更新时间和核验状态区分新信息与待确认信息。", href: "/companies", icon: Sparkles },
+      { title: "投递进度管理", copy: "先保留官方入口、截止节点和反馈纠错，后续扩展个人看板。", href: "/about", icon: ClipboardCheck },
     ];
 
     return (
@@ -24,9 +49,9 @@ export default async function HomePage() {
           <div className="hero-grid-lines" />
           <div className="shell hero-inner">
             <div className="hero-copy">
-              <p className="eyebrow hero-eyebrow">VEHICLE TALENT INTELLIGENCE / 2027</p>
-              <h1><span>Vehicle Campus Hub</span>车辆行业校招信息，一站式汇总</h1>
-              <p className="hero-lead">聚合车企、自动驾驶公司、零部件企业与新能源三电企业的校园招聘信息，为车辆、机械、自动驾驶、嵌入式方向学生提供清晰的求职雷达。</p>
+              <p className="eyebrow hero-eyebrow">Vehicle Campus Hub / 2027</p>
+              <h1><span>2027届车辆行业校招信息聚合平台</span>2027届车辆行业校招雷达</h1>
+              <p className="hero-lead">聚合车企、新势力、自动驾驶、三电、零部件企业的官方投递入口、时间线、岗位方向和笔试面经，服务车辆工程、机械、自动化、控制、嵌入式、自动驾驶、电池与热管理方向学生。</p>
               <div className="hero-actions">
                 <Link href="#companies" className="button button-accent">浏览校招企业<ArrowRight size={16} /></Link>
                 <Link href="/calendar" className="button button-ghost">查看校招日历</Link>
@@ -37,7 +62,7 @@ export default async function HomePage() {
               <div className="radar">
                 <div className="radar-ring ring-one" /><div className="radar-ring ring-two" />
                 <div className="radar-sweep" /><span className="radar-dot dot-one" /><span className="radar-dot dot-two" /><span className="radar-dot dot-three" />
-                <strong>25</strong><small>TRACKED COMPANIES</small>
+                <strong>{companies.length}</strong><small>2027 TRACKED COMPANIES</small>
               </div>
               <div className="dashboard-ticks"><span>整车</span><span>三电</span><span>智驾</span><span>软件</span></div>
             </div>
@@ -53,21 +78,95 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <section className="shell signal-strip" aria-label="校招雷达功能入口">
+          {productSignals.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link className="signal-card" href={item.href} key={item.title}>
+                <Icon size={20} />
+                <div>
+                  <strong>{item.title}</strong>
+                  <span>{item.copy}</span>
+                </div>
+                <ArrowRight size={16} />
+              </Link>
+            );
+          })}
+        </section>
+
+        <section className="shell page-section focus-section">
+          <div className="section-heading">
+            <div><p className="eyebrow">TODAY FOCUS</p><h2>今日重点</h2></div>
+            <p>先处理“能投递、快截止、值得关注但待核验”的信息，避免在高密度列表里迷失。</p>
+          </div>
+          <div className="focus-grid">
+            {focusGroups.map((group) => (
+              <article className="focus-card" key={group.title}>
+                <div>
+                  <h3>{group.title}</h3>
+                  <p>{group.copy}</p>
+                </div>
+                {group.items.length ? (
+                  <ul>
+                    {group.items.map((company) => (
+                      <li key={company.id}>
+                        <span>{company.shortName}</span>
+                        <Link href={`/companies/${company.slug}`}>查看</Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="empty-row">暂无匹配企业。</p>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section className="shell page-section" id="companies">
           <div className="section-heading">
-            <div><p className="eyebrow">CAMPUS RECRUITMENT INDEX</p><h2>寻找你的目标企业</h2></div>
-            <p>从行业类型、校招状态和岗位方向切入，快速缩小投递范围。</p>
+            <div><p className="eyebrow">FEATURED COMPANIES</p><h2>重点公司卡片</h2></div>
+            <p>卡片优先展示 2027 届状态、官方投递入口、车辆方向标签和数据核验状态。</p>
+          </div>
+          <div className="company-grid">
+            {companies.slice(0, 6).map((company) => <CompanyCard key={company.id} company={company} />)}
+          </div>
+          <div className="section-actions">
+            <Link href="/companies" className="button button-primary">进入完整公司库<ArrowRight size={15} /></Link>
+          </div>
+        </section>
+
+        <section className="shell page-section">
+          <div className="section-heading">
+            <div><p className="eyebrow">QUICK FILTER</p><h2>快速筛选</h2></div>
+            <p>支持公司名、城市、岗位方向搜索，适合移动端快速定位目标企业。</p>
           </div>
           <CompanyExplorer companies={companies} />
         </section>
 
-        <section className="about-band" id="about">
+        <section className="shell page-section latest-section">
+          <div className="section-heading">
+            <div><p className="eyebrow">LATEST UPDATES</p><h2>最新更新</h2></div>
+            <p>仅展示最近更新的企业记录，核验时间和官方入口状态以详情页为准。</p>
+          </div>
+          <div className="update-list">
+            {companies.slice(0, 5).map((company) => (
+              <Link href={`/companies/${company.slug}`} className="update-row" key={company.id}>
+                <span>{company.shortName}</span>
+                <strong>{company.recruitments?.[0]?.status ?? company.status}</strong>
+                <small>{company.dataStatus} · {new Date(company.lastUpdatedAt).toLocaleDateString("zh-CN")}</small>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="about-band">
           <div className="shell about-grid">
-            <div><p className="eyebrow">WHY THIS PROJECT</p><h2>为车辆研究生重做校招信息结构</h2></div>
+            <div><p className="eyebrow">WHY THIS PROJECT</p><h2>为车辆行业学生重做校招信息结构</h2></div>
             <div className="about-points">
-              <p><strong>01</strong>不只列公司，更明确车辆方向适配度与准备技能。</p>
-              <p><strong>02</strong>官方信息、公开整理和候选人经验按可信度区分。</p>
-              <p><strong>03</strong>数据 API 可继续复用到微信小程序与移动应用。</p>
+              <p><strong>01</strong>明确 2027 届，避免把往届经验误当成当前批次信息。</p>
+              <p><strong>02</strong>官方、较可信、经验参考和待核实分层展示，不假装所有内容都可投递。</p>
+              <p><strong>03</strong>数据结构面向 Web、微信小程序和 App 复用，后续可扩展收藏、订阅和纠错队列。</p>
             </div>
           </div>
         </section>
