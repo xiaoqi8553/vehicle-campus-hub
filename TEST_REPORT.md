@@ -54,6 +54,19 @@
 - `npm run test:e2e`：通过，`40/40`
 - 禁止假链接扫描：页面、组件、seed 中未发现 `example.com`；仅安全函数保留拦截规则。
 
+### 生产部署验证
+
+- 生产 URL：<https://vehicle-campus-hub.vercel.app>
+- Vercel 状态：Ready
+- 部署时间：2026-06-10 15:55:59（中国标准时间）
+- 部署 ID：`dpl_2EyNvpk2qmBgpzYZEPEqz9ZMHJYq`
+- 应用 commit：`f97979460554dde3aac423674f376072e237f957`
+- 线上检查页面：`/`、`/companies`、`/companies/xiaomi-auto`、`/companies/byd`、`/calendar`、`/resources`、`/about`
+- 线上结果：HTTP 200、无白屏、无 hydration error、无严重控制台错误、无横向滚动、无 `example.com` 链接、无空 `href`
+- `/admin`：生产环境返回 404
+
+线上首次复测发现首页和公司库存在 React hydration 文本不一致，根因为公司卡片日期在 Vercel UTC 与本地浏览器时区格式化不一致。已将公司卡片日期格式化固定到 UTC，重新部署后线上错误消失。
+
 Playwright 覆盖 `/`、`/companies`、`/companies/xiaomi-auto`、`/companies/byd`、`/calendar`、`/resources`、`/about`、`/admin` 守卫，以及 390px 移动端和多视口横向滚动检查。
 
 ### 仍需人工补充
