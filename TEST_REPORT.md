@@ -46,6 +46,17 @@
 - 带具体岗位 URL 的官方岗位。
 - 5 个访问受限或超时招聘入口的再次核验。
 
+### 生产部署
+
+- 正式 URL：<https://vehicle-campus-hub.vercel.app>
+- 应用 commit：`0457f71daed9345a1620e22bc5e20ac5b7e40b7f`
+- 部署 ID：`dpl_6yzf76anugbdDb5gsos19sCfNwgg`
+- 部署时间：2026-06-11 11:06:00（中国标准时间）
+- Vercel 状态：Ready
+- 线上验证：Desktop 1440、iPhone SE、iPhone 14、iPad 全部无横向滚动、每页一个 H1、无 page error、严重 console error 或假链接。
+- 线上数据：首页 8 条企业、公司库 25 条、日历正式事件 0 条、观察清单 25 条、公共资料 6 条。
+- `/admin`：HTTP 404。
+
 ## 2026-06-10 可信校招工具重构
 
 ### 原有问题

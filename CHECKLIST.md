@@ -72,4 +72,4 @@
 - [x] 无 `example.com`、空 `href` 或 `#`
 - [x] `/admin` 生产默认关闭
 - [x] iPhone SE、iPhone 14、iPad、Desktop 无横向滚动
-- [ ] 生产部署与线上复测
+- [x] 生产部署与线上复测
