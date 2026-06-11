@@ -1,5 +1,46 @@
 # Vehicle Campus Hub 测试报告
 
+## 2026-06-11 工程治理与 PostgreSQL 迁移
+
+### 已完成
+
+- 创建并推送稳定基线 tag `v2.1.0`，对应 commit `f3480ca`。
+- 建立 `codex/project-governance` 功能分支和 Conventional Commits 规范。
+- 新增 PostgreSQL 16 CI，覆盖 migration、seed、数据校验、格式、lint、typecheck、unit、build 和完整 E2E。
+- Prisma datasource 从 SQLite 改为 PostgreSQL，旧 migrations 移入只读归档。
+- `prisma/dev.db` 已停止 Git 跟踪，本地文件仍保留用于一次性数据迁移。
+- 新增 SQLite→PostgreSQL 迁移、数量/关联校验、Neon 恢复点和生产 smoke 工具。
+- 新增 Release Please、CodeQL、Dependabot、每周外链巡检和部署标签工作流。
+- 新增 `/api/health`，用于校验生产版本、commit 和部署环境。
+- 新增贡献、发布、回退、安全和 ADR 文档。
+
+### 自动验证
+
+| 检查                          | 结果       |
+| ----------------------------- | ---------- |
+| GitHub Actions CI             | 通过       |
+| PostgreSQL baseline migration | 通过       |
+| PostgreSQL seed               | 通过       |
+| 数据库数量与关联校验          | 通过       |
+| UTF-8 / BOM 校验              | 通过       |
+| Prettier                      | 通过       |
+| ESLint                        | 通过       |
+| TypeScript                    | 通过       |
+| Unit                          | 13/13 通过 |
+| Next.js build                 | 通过       |
+| Playwright E2E                | 通过       |
+
+CI run：<https://github.com/xiaoqi8553/vehicle-campus-hub/actions/runs/27359454683>
+
+首次 CI 在 `prisma migrate deploy` 失败，根因是 `migration_lock.toml` 带 UTF-8 BOM。去除 BOM 并把 BOM 检查加入 `check:utf8` 后，第二次 CI 全部通过。
+
+### 待账户授权
+
+- GitHub CLI 尚未登录，因此 GitHub Release、PR 创建和 `main` Ruleset 尚未完成。
+- Vercel 账户尚未添加 GitHub Login Connection，因此项目不能绑定 Git 自动 Preview/Production。
+- Neon Marketplace 条款尚未由账户所有者确认，因此尚未创建生产 PostgreSQL、迁移生产数据或执行 Neon 回退演练。
+- 在上述授权完成前，不部署 PostgreSQL 版本到生产，避免当前线上站点因缺少 `DATABASE_URL` 中断。
+
 ## 2026-06-11 2.0 结构重构
 
 ### 原有问题
