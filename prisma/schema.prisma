@@ -19,6 +19,11 @@ model Company {
   officialWebsite          String?
   campusRecruitmentWebsite String?
   campusUrl                String?
+  sourceUrl                String?
+  sourceType               String          @default("UNKNOWN")
+  verifiedAt               DateTime?
+  dateConfidence           String          @default("UNKNOWN")
+  changeSummary            String?
   cities                   String          @default("[]")
   tags                     String          @default("[]")
   vehicleDirections        String          @default("[]")
@@ -52,7 +57,10 @@ model Recruitment {
   note           String?
   notes          String?
   sourceUrl      String?
-  sourceType     String?
+  sourceType     String          @default("UNKNOWN")
+  verifiedAt     DateTime?
+  dateConfidence String          @default("UNKNOWN")
+  changeSummary  String?
   credibility    String
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -76,6 +84,11 @@ model Job {
   majors           String       @default("[]")
   skills           String       @default("[]")
   applyUrl         String?
+  sourceUrl        String?
+  sourceType       String       @default("UNKNOWN")
+  verifiedAt       DateTime?
+  dateConfidence   String       @default("UNKNOWN")
+  changeSummary    String?
   vehicleFitScore  Int
   matchScore       Int?
   createdAt        DateTime     @default(now())
@@ -98,6 +111,9 @@ model Resource {
   sourceUrl      String?
   source         String
   sourceType     String?
+  verifiedAt     DateTime?
+  dateConfidence String    @default("UNKNOWN")
+  changeSummary  String?
   summary        String
   credibility    String
   tags           String    @default("[]")
@@ -138,9 +154,13 @@ model CalendarEvent {
   programId     String?
   title         String
   eventType     String
-  eventDate     DateTime
+  eventDate     DateTime?
   status        String
   sourceUrl     String?
+  sourceType    String       @default("UNKNOWN")
+  verifiedAt    DateTime?
+  dateConfidence String      @default("UNKNOWN")
+  changeSummary String?
   credibility   String       @default("待核实")
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt

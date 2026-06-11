@@ -12,13 +12,23 @@ export default async function HomePage() {
   try {
     const companies = await getCompanies();
     const now = new Date();
-    const officialLinkCount = companies.filter((company) =>
-      safeExternalUrl(company.recruitments?.[0]?.applyUrl ?? company.campusRecruitmentWebsite),
-    ).length;
-    const activeCompanies = companies.filter((company) => company.recruitments?.[0]?.status === "已开启");
+    const officialLinkCount = companies.filter((company) => {
+      const program = company.recruitments?.[0];
+      return Boolean(
+        safeExternalUrl(program?.applyUrl ?? company.campusRecruitmentWebsite)
+        && (program?.sourceType === "OFFICIAL" ? program.verifiedAt : company.verifiedAt),
+      );
+    }).length;
+    const activeCompanies = companies.filter((company) => {
+      const program = company.recruitments?.[0];
+      return program?.status === "已开启"
+        && program.dateConfidence === "VERIFIED"
+        && Boolean(program.verifiedAt);
+    });
     const closingSoon = companies.filter((company) => {
-      const endDate = company.recruitments?.[0]?.endDate;
-      if (!endDate) return false;
+      const program = company.recruitments?.[0];
+      const endDate = program?.endDate;
+      if (!endDate || program.dateConfidence !== "VERIFIED" || !program.verifiedAt) return false;
       const daysLeft = Math.ceil((Date.parse(endDate) - now.getTime()) / DAY_MS);
       return daysLeft >= 0 && daysLeft <= 7;
     });
@@ -42,6 +52,21 @@ export default async function HomePage() {
       { title: "24h 更新视角", copy: "用最近更新时间和核验状态区分新信息与待确认信息。", href: "/companies", icon: Sparkles },
       { title: "投递进度管理", copy: "先保留官方入口、截止节点和反馈纠错，后续扩展个人看板。", href: "/about", icon: ClipboardCheck },
     ];
+    const latestUpdates = companies
+      .filter((company) => company.changeSummary?.trim())
+      .slice(0, 5);
+    const featuredCompanies = [...companies]
+      .sort((a, b) => {
+        const aProgram = a.recruitments?.[0];
+        const bProgram = b.recruitments?.[0];
+        const score = (company: typeof a, program: typeof aProgram) =>
+          Number(Boolean(company.verifiedAt)) * 4
+          + Number(Boolean(safeExternalUrl(program?.applyUrl ?? company.campusRecruitmentWebsite))) * 2
+          + Number(company.dataStatus === "已核验");
+        return score(b, bProgram) - score(a, aProgram)
+          || a.name.localeCompare(b.name, "zh-CN");
+      })
+      .slice(0, 6);
 
     return (
       <>
@@ -111,7 +136,7 @@ export default async function HomePage() {
                     {group.items.map((company) => (
                       <li key={company.id}>
                         <span>{company.shortName}</span>
-                        <Link href={`/companies/${company.slug}`}>查看</Link>
+                        <Link className="focus-link" href={`/companies/${company.slug}`}>查看</Link>
                       </li>
                     ))}
                   </ul>
@@ -128,8 +153,8 @@ export default async function HomePage() {
             <div><p className="eyebrow">FEATURED COMPANIES</p><h2>重点公司卡片</h2></div>
             <p>卡片优先展示 2027 届状态、官方投递入口、车辆方向标签和数据核验状态。</p>
           </div>
-          <div className="company-grid">
-            {companies.slice(0, 6).map((company) => <CompanyCard key={company.id} company={company} />)}
+          <div className="company-grid" data-testid="featured-companies">
+            {featuredCompanies.map((company) => <CompanyCard key={company.id} company={company} />)}
           </div>
           <div className="section-actions">
             <Link href="/companies" className="button button-primary">进入完整公司库<ArrowRight size={15} /></Link>
@@ -141,7 +166,7 @@ export default async function HomePage() {
             <div><p className="eyebrow">QUICK FILTER</p><h2>快速筛选</h2></div>
             <p>支持公司名、城市、岗位方向搜索，适合移动端快速定位目标企业。</p>
           </div>
-          <CompanyExplorer companies={companies} />
+          <CompanyExplorer companies={companies} limit={6} />
         </section>
 
         <section className="shell page-section latest-section">
@@ -150,11 +175,15 @@ export default async function HomePage() {
             <p>仅展示最近更新的企业记录，核验时间和官方入口状态以详情页为准。</p>
           </div>
           <div className="update-list">
-            {companies.slice(0, 5).map((company) => (
-              <Link href={`/companies/${company.slug}`} className="update-row" key={company.id}>
+            {latestUpdates.map((company) => (
+              <Link href={`/companies/${company.slug}`} className="update-row" data-testid="latest-update" key={company.id}>
                 <span>{company.shortName}</span>
-                <strong>{company.recruitments?.[0]?.status ?? company.status}</strong>
-                <small>{company.dataStatus} · {new Date(company.lastUpdatedAt).toLocaleDateString("zh-CN")}</small>
+                <strong data-testid="change-summary">{company.changeSummary}</strong>
+                <small>
+                  内容更新 {new Date(company.lastUpdatedAt).toLocaleDateString("zh-CN")}
+                  {" · "}
+                  最后核验 {company.verifiedAt ? new Date(company.verifiedAt).toLocaleDateString("zh-CN") : "待补充"}
+                </small>
               </Link>
             ))}
           </div>

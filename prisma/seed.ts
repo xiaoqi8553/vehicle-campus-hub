@@ -259,7 +259,7 @@ const companies: SeedCompany[] = [
     officialWebsite: "https://www.catl.com/",
     campusRecruitmentWebsite: "https://career.catl.com/",
     description: "宁德时代是动力电池与储能方向核心企业，适合电池材料、电池系统、热管理、测试验证和智能制造方向学生。",
-    lastVerifiedAt: "2026-06-10",
+    lastVerifiedAt: null,
   },
   {
     id: "calb",
@@ -330,11 +330,11 @@ const companies: SeedCompany[] = [
     tags: ["热管理", "电装系统"],
     vehicleDirections: ["热管理", "电机电控", "嵌入式", "测试验证"],
     status: "已开启",
-    dataStatus: "已核验",
+    dataStatus: "待核实",
     officialWebsite: "https://www.denso.com/cn/zh/",
     campusRecruitmentWebsite: "https://www.denso.com/cn/zh/careers/",
     description: "电装在热管理、电装系统、动力控制和车载电子方向具备优势，适合热管理、嵌入式和电子控制方向同学。",
-    lastVerifiedAt: "2026-06-10",
+    lastVerifiedAt: null,
   },
   {
     id: "horizon",
@@ -397,22 +397,6 @@ const companies: SeedCompany[] = [
     lastVerifiedAt: null,
   },
 ];
-
-const startDates: Record<string, string | null> = {
-  未开始: "2026-07-01",
-  已开启: "2026-05-20",
-  即将截止: "2026-05-10",
-  已结束: "2026-03-01",
-  待确认: null,
-};
-
-const endDates: Record<string, string | null> = {
-  未开始: "2026-08-15",
-  已开启: "2026-07-20",
-  即将截止: "2026-06-16",
-  已结束: "2026-04-01",
-  待确认: null,
-};
 
 const resourceTemplates = [
   {
@@ -480,38 +464,46 @@ async function main() {
         officialWebsite: item.officialWebsite,
         campusRecruitmentWebsite: item.campusRecruitmentWebsite,
         campusUrl: item.campusRecruitmentWebsite,
+        sourceUrl: item.campusRecruitmentWebsite ?? item.officialWebsite,
+        sourceType: item.campusRecruitmentWebsite || item.officialWebsite ? "OFFICIAL" : "UNKNOWN",
+        verifiedAt,
+        dateConfidence: "UNKNOWN",
+        changeSummary: item.campusRecruitmentWebsite
+          ? "核验企业招聘入口；2027届批次与日期仍待确认"
+          : "补充车辆方向标签；官方校招来源待补",
         cities: stringifyStringList(item.cities),
         tags: stringifyStringList(item.tags),
         vehicleDirections: stringifyStringList(item.vehicleDirections),
         fitDirections: stringifyStringList(item.vehicleDirections),
-        status: item.status,
+        status: "待确认",
         dataStatus: item.dataStatus,
         lastVerifiedAt: verifiedAt,
-        lastUpdatedAt: new Date(`2026-06-${String((index % 10) + 1).padStart(2, "0")}T08:00:00Z`),
+        lastUpdatedAt: new Date("2026-06-10T12:00:00.000Z"),
       },
     });
 
     const isOfficial = Boolean(item.campusRecruitmentWebsite && item.lastVerifiedAt);
-    const startDate = dateOrNull(startDates[item.status]);
-    const endDate = endDates[item.status] ? new Date(`${endDates[item.status]}T23:59:59Z`) : null;
     const recruitment = await prisma.recruitment.create({
       data: {
         companyId: company.id,
         year: 2027,
         targetYear: 2027,
-        season: index % 4 === 0 ? "提前批" : index % 4 === 1 ? "秋招" : index % 4 === 2 ? "春招" : "实习转正",
-        batch: index % 4 === 0 ? "提前批" : index % 4 === 1 ? "秋招" : index % 4 === 2 ? "春招" : "实习转正",
+        season: "待确认",
+        batch: "待确认",
         title: `${item.shortName} 2027届校园招聘跟踪`,
-        status: item.status,
-        startDate,
-        endDate,
+        status: "待确认",
+        startDate: null,
+        endDate: null,
         applyUrl: item.campusRecruitmentWebsite,
-        process: "网申 → 测评/笔试 → 技术面 → 综合面/HR面 → Offer",
-        note: isOfficial ? "已保留企业官方入口，投递前请再次确认岗位批次和城市。" : "当前缺少已核验的 2027 届官方投递入口，请以企业后续公告为准。",
-        notes: isOfficial ? "已保留企业官方入口，投递前请再次确认岗位批次和城市。" : "当前缺少已核验的 2027 届官方投递入口，请以企业后续公告为准。",
+        process: "流程待核实；常见环节可能包括网申、测评、面试和录用沟通。",
+        note: isOfficial ? "企业招聘入口已核验，但尚未确认 2027 届批次、岗位和日期。" : "当前缺少已核验的 2027 届官方投递入口，请以企业后续公告为准。",
+        notes: isOfficial ? "企业招聘入口已核验，但尚未确认 2027 届批次、岗位和日期。" : "当前缺少已核验的 2027 届官方投递入口，请以企业后续公告为准。",
         sourceUrl: item.campusRecruitmentWebsite,
-        sourceType: isOfficial ? "官方招聘站" : "公开整理",
-        credibility: isOfficial ? "官方" : "待核实",
+        sourceType: isOfficial ? "OFFICIAL" : "UNKNOWN",
+        verifiedAt,
+        dateConfidence: "UNKNOWN",
+        changeSummary: isOfficial ? "补充并核验企业招聘入口" : "标记为待补官方来源",
+        credibility: "待核实",
       },
     });
 
@@ -531,9 +523,14 @@ async function main() {
           : direction.includes("嵌入式")
             ? ["C/C++", "CAN", "Linux/RTOS", "调试能力"]
             : ["车辆基础", "工程分析", "试验验证", "项目复盘"]),
-        applyUrl: item.campusRecruitmentWebsite,
-        vehicleFitScore: 92 - ((index + jobIndex * 5) % 22),
-        matchScore: 92 - ((index + jobIndex * 5) % 22),
+        applyUrl: null,
+        sourceUrl: null,
+        sourceType: "UNKNOWN",
+        verifiedAt: null,
+        dateConfidence: "UNKNOWN",
+        changeSummary: "保留车辆方向参考，待补官方职位来源",
+        vehicleFitScore: 0,
+        matchScore: null,
       })),
     });
 
@@ -543,16 +540,19 @@ async function main() {
       data: [
         {
           companyId: company.id,
-          title: `${item.shortName} ${resourceA.title}`,
+          title: `平台通用：${resourceA.title}`,
           type: resourceA.type,
           targetYear: 2027,
           sourceYear: 2026,
           url: null,
           sourceUrl: null,
           source: "候选人经验整理（待补真实链接）",
-          sourceType: "候选人经验",
-          summary: resourceA.summary,
-          credibility: "经验参考",
+          sourceType: "UNKNOWN",
+          verifiedAt: null,
+          dateConfidence: "UNKNOWN",
+          changeSummary: "补充通用准备框架，待补可核验来源",
+          summary: `${resourceA.summary} 本条仅按企业方向标签关联，不代表 ${item.shortName} 的实际题库或面试流程。`,
+          credibility: "待核实",
           tags: stringifyStringList(resourceA.tags),
           lastVerifiedAt: null,
         },
@@ -565,33 +565,35 @@ async function main() {
           url: item.campusRecruitmentWebsite,
           sourceUrl: item.campusRecruitmentWebsite,
           source: item.campusRecruitmentWebsite ? "企业官方招聘站" : "公开信息整理（待补链接）",
-          sourceType: item.campusRecruitmentWebsite ? "官方招聘站" : "公开整理",
+          sourceType: isOfficial ? "OFFICIAL" : "UNKNOWN",
+          verifiedAt,
+          dateConfidence: "UNKNOWN",
+          changeSummary: isOfficial ? "核验企业招聘入口" : "标记为待补官方来源",
           summary: item.campusRecruitmentWebsite
             ? `已整理 ${item.shortName} 官方招聘入口，投递前仍需核对 2027 届批次、城市和岗位要求。`
             : `${item.shortName} 暂未补充可核验的 2027 届官方投递入口，建议关注企业官网、公众号和学校就业网。`,
-          credibility: item.campusRecruitmentWebsite ? "官方" : "待核实",
+          credibility: isOfficial ? "官方" : "待核实",
           tags: stringifyStringList(resourceB.tags),
           lastVerifiedAt: verifiedAt,
         },
       ],
     });
 
-    const eventType = item.status === "未开始" ? "网申开始" : "网申截止";
     await prisma.calendarEvent.create({
       data: {
         companyId: company.id,
         recruitmentId: recruitment.id,
         programId: recruitment.id,
-        title: `${item.shortName} ${eventType}`,
-        eventType,
-        eventDate: item.status === "未开始"
-          ? new Date(`${startDates[item.status]}T09:00:00Z`)
-          : item.status === "待确认"
-            ? new Date(`2026-07-${String((index % 18) + 1).padStart(2, "0")}T09:00:00Z`)
-            : new Date(`${endDates[item.status]}T18:00:00Z`),
-        status: item.status,
+        title: `${item.shortName} 2027届校招节点待确认`,
+        eventType: "网申开始",
+        eventDate: null,
+        status: "待确认",
         sourceUrl: item.campusRecruitmentWebsite,
-        credibility: item.campusRecruitmentWebsite ? "官方" : "待核实",
+        sourceType: isOfficial ? "OFFICIAL" : "UNKNOWN",
+        verifiedAt,
+        dateConfidence: "UNKNOWN",
+        changeSummary: isOfficial ? "已核验招聘入口，日期仍待官方发布" : "等待补充官方来源与日期",
+        credibility: "待核实",
       },
     });
   }

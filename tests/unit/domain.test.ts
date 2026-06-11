@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   determineRecruitmentStatus,
-  fitScoreLevel,
   generateVehicleAdvice,
+  groupCalendarEvents,
   parseStringList,
   safeExternalUrl,
   stringifyStringList,
+  vehicleRelevance,
 } from "@/lib/domain";
 
 describe("determineRecruitmentStatus", () => {
@@ -55,14 +56,69 @@ describe("string list persistence", () => {
   });
 });
 
-describe("fitScoreLevel", () => {
-  it.each([
-    [95, "极高"],
-    [80, "较高"],
-    [65, "中等"],
-    [59, "较低"],
-  ])("maps %i to %s", (score, level) => {
-    expect(fitScoreLevel(score).label).toBe(level);
+describe("vehicleRelevance", () => {
+  it("returns an explainable level instead of an unexplained exact score", () => {
+    expect(vehicleRelevance({
+      direction: "自动驾驶",
+      majors: ["车辆工程", "自动化"],
+      skills: ["C++", "Python", "仿真评测"],
+    })).toEqual({
+      level: "高相关",
+      className: "fit-high",
+      reasons: ["岗位方向匹配", "专业相关度", "车辆工程关键词", "技能匹配"],
+    });
+  });
+});
+
+describe("groupCalendarEvents", () => {
+  const now = new Date("2026-06-10T00:00:00.000Z");
+  const base = {
+    company: { id: "xiaomi-auto", name: "小米汽车" },
+    eventType: "网申截止",
+    sourceUrl: "https://hr.xiaomi.com/",
+    sourceType: "OFFICIAL",
+    verifiedAt: "2026-06-10T00:00:00.000Z",
+    dateConfidence: "VERIFIED",
+  };
+
+  it("places each verified event in only one time group", () => {
+    const event = {
+      ...base,
+      id: "verified-deadline",
+      eventDate: "2026-06-16T00:00:00.000Z",
+    };
+    const groups = groupCalendarEvents([event], now);
+    expect(groups.sevenDays.map((item) => item.id)).toEqual(["verified-deadline"]);
+    expect(groups.thirtyDays).toEqual([]);
+    expect(groups.currentMonth).toEqual([]);
+    expect(groups.pending).toEqual([]);
+  });
+
+  it("keeps unverified dates in a company-level observation list", () => {
+    const events = [
+      {
+        ...base,
+        id: "pending-one",
+        eventDate: "2026-06-12T00:00:00.000Z",
+        sourceUrl: null,
+        sourceType: "UNKNOWN",
+        verifiedAt: null,
+        dateConfidence: "UNKNOWN",
+      },
+      {
+        ...base,
+        id: "pending-two",
+        eventDate: "2026-06-18T00:00:00.000Z",
+        sourceUrl: null,
+        sourceType: "UNKNOWN",
+        verifiedAt: null,
+        dateConfidence: "UNKNOWN",
+      },
+    ];
+    const groups = groupCalendarEvents(events, now);
+    expect(groups.sevenDays).toEqual([]);
+    expect(groups.pending).toHaveLength(1);
+    expect(groups.pending[0].company.id).toBe("xiaomi-auto");
   });
 });
 

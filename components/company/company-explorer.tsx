@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { CompanyCard } from "@/components/company/company-card";
@@ -7,21 +8,36 @@ import type { CompanyCardData } from "@/lib/data";
 import { COMPANY_CATEGORIES, CREDIBILITY_LEVELS, JOB_DIRECTIONS, RECRUITMENT_STATUSES } from "@/lib/constants";
 import { safeExternalUrl } from "@/lib/domain";
 
+export type CompanyExplorerFilters = {
+  query?: string;
+  category?: string;
+  status?: string;
+  direction?: string;
+  city?: string;
+  credibility?: string;
+  hasOfficialLink?: string;
+  sort?: string;
+};
+
 export function CompanyExplorer({
   companies,
   showSort = false,
+  limit,
+  initialFilters = {},
 }: {
   companies: CompanyCardData[];
   showSort?: boolean;
+  limit?: number;
+  initialFilters?: CompanyExplorerFilters;
 }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const [status, setStatus] = useState("");
-  const [direction, setDirection] = useState("");
-  const [city, setCity] = useState("");
-  const [credibility, setCredibility] = useState("");
-  const [hasOfficialLink, setHasOfficialLink] = useState("");
-  const [sort, setSort] = useState("updated");
+  const [query, setQuery] = useState(initialFilters.query ?? "");
+  const [category, setCategory] = useState(initialFilters.category ?? "");
+  const [status, setStatus] = useState(initialFilters.status ?? "");
+  const [direction, setDirection] = useState(initialFilters.direction ?? "");
+  const [city, setCity] = useState(initialFilters.city ?? "");
+  const [credibility, setCredibility] = useState(initialFilters.credibility ?? "");
+  const [hasOfficialLink, setHasOfficialLink] = useState(initialFilters.hasOfficialLink ?? "");
+  const [sort, setSort] = useState(initialFilters.sort ?? "updated");
   const cities = useMemo(
     () => [...new Set(companies.flatMap((company) => company.cities))].sort((a, b) => a.localeCompare(b, "zh-CN")),
     [companies],
@@ -63,6 +79,20 @@ export function CompanyExplorer({
         return new Date(b.lastUpdatedAt).getTime() - new Date(a.lastUpdatedAt).getTime();
       });
   }, [category, city, companies, credibility, direction, hasOfficialLink, query, sort, status]);
+  const visibleCompanies = limit ? filtered.slice(0, limit) : filtered;
+  const fullListHref = useMemo(() => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (category) params.set("type", category);
+    if (status) params.set("status", status);
+    if (direction) params.set("direction", direction);
+    if (city) params.set("city", city);
+    if (credibility) params.set("credibility", credibility);
+    if (hasOfficialLink) params.set("official", hasOfficialLink);
+    if (sort !== "updated") params.set("sort", sort);
+    const queryString = params.toString();
+    return queryString ? `/companies?${queryString}` : "/companies";
+  }, [category, city, credibility, direction, hasOfficialLink, query, sort, status]);
 
   return (
     <div className="explorer" data-testid="company-explorer">
@@ -70,6 +100,7 @@ export function CompanyExplorer({
         <label className="search-field">
           <Search size={18} />
           <input
+            aria-label="搜索公司"
             placeholder="搜索公司、岗位方向、城市或标签"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -78,7 +109,7 @@ export function CompanyExplorer({
         <div className="filter-grid">
           <label>
             <span>公司类型</span>
-            <select value={category} onChange={(event) => setCategory(event.target.value)}>
+            <select aria-label="公司类型" value={category} onChange={(event) => setCategory(event.target.value)}>
               <option value="">全部类型</option>
               {COMPANY_CATEGORIES.map((item) => <option key={item}>{item}</option>)}
             </select>
@@ -92,7 +123,7 @@ export function CompanyExplorer({
           </label>
           <label>
             <span>岗位方向</span>
-            <select value={direction} onChange={(event) => setDirection(event.target.value)}>
+            <select aria-label="岗位方向" value={direction} onChange={(event) => setDirection(event.target.value)}>
               <option value="">全部方向</option>
               {JOB_DIRECTIONS.map((item) => <option key={item}>{item}</option>)}
             </select>
@@ -122,7 +153,7 @@ export function CompanyExplorer({
           {showSort && (
             <label>
               <span>排序方式</span>
-              <select value={sort} onChange={(event) => setSort(event.target.value)}>
+              <select aria-label="排序方式" value={sort} onChange={(event) => setSort(event.target.value)}>
                 <option value="updated">最近更新</option>
                 <option value="deadline">即将截止</option>
                 <option value="status">校招已开启优先</option>
@@ -143,9 +174,18 @@ export function CompanyExplorer({
         )}
       </div>
       {filtered.length ? (
-        <div className="company-grid">
-          {filtered.map((company) => <CompanyCard key={company.id} company={company} />)}
-        </div>
+        <>
+          <div className="company-grid">
+            {visibleCompanies.map((company) => <CompanyCard key={company.id} company={company} />)}
+          </div>
+          {limit && (
+            <div className="section-actions">
+              <Link href={fullListHref} className="button button-primary">
+                查看全部 {filtered.length} 家企业
+              </Link>
+            </div>
+          )}
+        </>
       ) : (
         <div className="data-state"><strong>没有匹配结果</strong><p>尝试减少筛选条件或更换关键词。</p></div>
       )}

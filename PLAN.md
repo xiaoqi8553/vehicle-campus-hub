@@ -2,6 +2,15 @@
 
 > 状态：已完成。最终验证结果见 `TEST_REPORT.md`。
 
+## 2026-06-10 可信度重构补充
+
+- 首页重点公司和快速筛选均限制为最多 6 家，筛选参数可带入公司库。
+- 最新更新改为基于 `changeSummary`，区分内容更新时间与最后核验时间。
+- 日历使用互斥分组；未核验记录按企业进入观察清单，不展示精确日期。
+- 五类核心模型统一补充来源、核验时间、日期可信度和变化摘要。
+- 岗位匹配分数改为可解释的车辆方向相关度等级。
+- 新增四视口横向滚动、44px 热区、可访问名称和错误监听测试。
+
 ## 2026-06-10 产品重构补充
 
 - 产品定位更新为“2027届车辆行业校招信息聚合平台”。
@@ -36,11 +45,11 @@
 
 ## 数据模型
 
-- `Company`：新增 `slug/shortName/type/vehicleDirections/campusRecruitmentWebsite/lastVerifiedAt/dataStatus`，数组字段以 JSON 字符串存储
-- `Recruitment`：兼容 RecruitmentProgram 展示字段，新增 `targetYear/batch/sourceType/notes`
-- `Job`：新增 `programId/majors/skills/matchScore`
-- `Resource`：新增 `targetYear/sourceYear/sourceUrl/sourceType/tags/lastVerifiedAt`
-- `CalendarEvent`：新增 `programId/sourceUrl/credibility`
+- `Company`：包含 `slug/shortName/type/vehicleDirections/campusRecruitmentWebsite/dataStatus` 与统一证据字段
+- `Recruitment`：兼容 RecruitmentProgram 展示字段，包含 `targetYear/batch/notes` 与统一证据字段
+- `Job`：包含 `programId/majors/skills` 与统一证据字段；精确分数字段仅保留迁移兼容
+- `Resource`：包含 `targetYear/sourceYear/tags/lastVerifiedAt` 与统一证据字段
+- `CalendarEvent`：包含 `programId/credibility` 与统一证据字段，`eventDate` 可空
 - `User/Favorite`：为后续账号与收藏功能预留
 
 ## API

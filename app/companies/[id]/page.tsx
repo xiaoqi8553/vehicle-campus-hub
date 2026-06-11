@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { ExternalLink } from "@/components/ui/external-link";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { fitScoreLevel, generateVehicleAdvice } from "@/lib/domain";
+import { generateVehicleAdvice, sourceTypeLabel, vehicleRelevance } from "@/lib/domain";
 import { getCompanyDetail } from "@/lib/data";
 
 const JOB_GROUPS = [
@@ -75,7 +75,13 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
               </div>
               <h1>{company.name} 2027届校招跟踪</h1>
               <p>{company.description}</p>
-              <p className="detail-verify">最后核验：{company.lastVerifiedAt ? new Date(company.lastVerifiedAt).toLocaleDateString("zh-CN") : "待补充"} · 信息可信度：{program?.credibility ?? "待核实"}</p>
+              <p className="detail-verify">
+                内容更新：{new Date(company.lastUpdatedAt).toLocaleDateString("zh-CN")}
+                {" · "}
+                最后核验：{company.verifiedAt ? new Date(company.verifiedAt).toLocaleDateString("zh-CN") : "待补充"}
+                {" · "}
+                信息可信度：{program?.credibility ?? "待核实"}
+              </p>
             </div>
             <div className="detail-actions">
               <ExternalLink href={program?.applyUrl ?? company.campusRecruitmentWebsite} className="button button-accent" emptyLabel="待补官方链接">官方投递入口</ExternalLink>
@@ -112,10 +118,11 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
                   <div><p className="eyebrow">{item.targetYear}届 / {item.batch}</p><h3>{item.title}</h3></div>
                   <StatusBadge status={item.status} />
                   <div className="timeline-meta">
-                    <span>开始：{item.startDate ? new Date(item.startDate).toLocaleDateString("zh-CN") : "待确认"}</span>
-                    <span>截止：{item.endDate ? new Date(item.endDate).toLocaleDateString("zh-CN") : "待确认"}</span>
-                    <span>来源：{item.sourceType}</span>
+                    <span>开始：{item.dateConfidence === "VERIFIED" && item.startDate ? new Date(item.startDate).toLocaleDateString("zh-CN") : "日期待确认"}</span>
+                    <span>截止：{item.dateConfidence === "VERIFIED" && item.endDate ? new Date(item.endDate).toLocaleDateString("zh-CN") : "日期待确认"}</span>
+                    <span>来源：{sourceTypeLabel(item.sourceType)}</span>
                     <span>可信度：{item.credibility}</span>
+                    <span>最后核验：{item.verifiedAt ? new Date(item.verifiedAt).toLocaleDateString("zh-CN") : "待补充"}</span>
                   </div>
                   <p className="process-line"><Route size={16} />{item.process}</p>
                   {item.notes && <p className="program-note">{item.notes}</p>}
@@ -130,21 +137,31 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
           </DetailSection>
 
           <DetailSection title="岗位方向分组" icon={BriefcaseBusiness}>
+            <div className="relevance-note">
+              <strong>车辆方向相关度参考</strong>
+              <p>依据岗位方向、专业关键词和技能标签分为高相关、中相关、低相关。仅为平台规则参考，不代表录用概率。</p>
+            </div>
             <div className="job-group-list">
               {[...groupedJobs, ...(otherJobs.length ? [{ direction: "其他方向", jobs: otherJobs }] : [])].map((group) => (
                 <section className="job-group" key={group.direction}>
                   <h3>{group.direction}</h3>
                   <div className="job-list">
                     {group.jobs.map((job) => {
-                      const fit = fitScoreLevel(job.matchScore);
+                      const relevance = vehicleRelevance(job);
                       return (
                         <article className="job-card" key={job.id}>
-                          <div className="job-score"><strong>{job.matchScore}</strong><span className={fit.className}>{fit.label}</span></div>
+                          <div className="job-score">
+                            <strong className={relevance.className}>{relevance.level}</strong>
+                            <span>方向参考</span>
+                          </div>
                           <div>
                             <p className="eyebrow">{job.city} · {job.education}</p>
-                            <h3>{job.title}</h3>
+                            <h3>{job.sourceType === "UNKNOWN" ? `方向参考：${job.direction}` : job.title}</h3>
                             <p>{job.majors.join(" / ") || job.majorRequirement}</p>
                             <small>{job.skills.join(" · ")}</small>
+                            <div className="job-reasons">
+                              {relevance.reasons.map((reason) => <span key={reason}>{reason}</span>)}
+                            </div>
                           </div>
                           <ExternalLink href={job.applyUrl} emptyLabel="待补充">岗位投递</ExternalLink>
                         </article>
@@ -164,7 +181,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
                   <h3>{resource.title}</h3>
                   <p>{resource.summary}</p>
                   <div className="tag-row">{resource.tags.slice(0, 4).map((tag) => <span className="tag" key={tag}>{tag}</span>)}</div>
-                  <small>{resource.targetYear}届 · 来源年份 {resource.sourceYear} · {resource.sourceType}</small>
+                  <small>{resource.targetYear}届 · 来源年份 {resource.sourceYear} · {sourceTypeLabel(resource.sourceType)}</small>
                   <ExternalLink href={resource.sourceUrl} emptyLabel="暂无链接，待补充">查看资料</ExternalLink>
                 </article>
               ))}

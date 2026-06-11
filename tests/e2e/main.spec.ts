@@ -17,8 +17,9 @@ test("homepage search, status filter and detail navigation work", async ({
   const initialCount = await explorerCards.count();
   await page.getByLabel("校招状态").selectOption("已开启");
   const filteredCount = await explorerCards.count();
-  expect(filteredCount).toBeGreaterThan(0);
   expect(filteredCount).toBeLessThan(initialCount);
+  await expect(page.getByText("没有匹配结果")).toBeVisible();
+  await page.getByLabel("校招状态").selectOption("");
 
   const detailLink = explorer.getByRole("link", { name: "查看详情" }).first();
   await expect(detailLink).toHaveAttribute("href", /\/companies\/.+/);

@@ -130,15 +130,15 @@ export function AdminDashboard({ data }: AdminProps) {
         {active === "companies" && (
           <>
             <AdminForm title="新增公司" onSubmit={(event) => submit(event, "/api/companies")} pending={pending}>
-              <input name="name" placeholder="公司名称 *" required />
-              <select name="category" required defaultValue=""><option value="" disabled>公司类型 *</option>{COMPANY_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select>
-              <select name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
-              <input name="cities" placeholder="城市，逗号分隔 *" required />
-              <input name="tags" placeholder="标签，逗号分隔 *" required />
-              <input name="fitDirections" placeholder="适配方向，逗号分隔 *" required />
-              <input name="officialWebsite" placeholder="公司官网（可空）" />
-              <input name="campusUrl" placeholder="校招官网（可空）" />
-              <textarea name="description" placeholder="公司简介 *" required />
+              <input aria-label="公司名称" name="name" placeholder="公司名称 *" required />
+              <select aria-label="公司类型" name="category" required defaultValue=""><option value="" disabled>公司类型 *</option>{COMPANY_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select>
+              <select aria-label="公司校招状态" name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
+              <input aria-label="公司城市" name="cities" placeholder="城市，逗号分隔 *" required />
+              <input aria-label="公司标签" name="tags" placeholder="标签，逗号分隔 *" required />
+              <input aria-label="车辆方向" name="fitDirections" placeholder="适配方向，逗号分隔 *" required />
+              <input aria-label="公司官网" name="officialWebsite" placeholder="公司官网（可空）" />
+              <input aria-label="校招官网" name="campusUrl" placeholder="校招官网（可空）" />
+              <textarea aria-label="公司简介" name="description" placeholder="公司简介 *" required />
             </AdminForm>
             <CompanyEditor
               companies={data.companies.slice(0, 12)}
@@ -153,16 +153,16 @@ export function AdminDashboard({ data }: AdminProps) {
           <>
             <AdminForm title="新增校招项目" onSubmit={(event) => submit(event, "/api/recruitments")} pending={pending}>
               <CompanySelect companies={data.companies} />
-              <input name="year" type="number" defaultValue="2027" required />
-              <input name="season" placeholder="招聘季节 *" required />
-              <input name="title" placeholder="项目标题 *" required />
-              <select name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
-              <input name="startDate" type="date" required />
-              <input name="endDate" type="date" required />
-              <input name="applyUrl" placeholder="投递链接（可空）" />
-              <input name="sourceUrl" placeholder="来源链接（可空）" />
-              <input name="credibility" defaultValue="官方" required />
-              <textarea name="process" defaultValue="网申 → 测评 → 笔试 → 技术面 → HR面 → Offer" required />
+              <input aria-label="目标届别" name="year" type="number" defaultValue="2027" required />
+              <input aria-label="招聘季节" name="season" placeholder="招聘季节 *" required />
+              <input aria-label="校招项目标题" name="title" placeholder="项目标题 *" required />
+              <select aria-label="校招项目状态" name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
+              <input aria-label="校招开始日期" name="startDate" type="date" />
+              <input aria-label="校招截止日期" name="endDate" type="date" />
+              <input aria-label="校招投递链接" name="applyUrl" placeholder="投递链接（可空）" />
+              <input aria-label="校招来源链接" name="sourceUrl" placeholder="来源链接（可空）" />
+              <input aria-label="校招可信度" name="credibility" defaultValue="待核实" required />
+              <textarea aria-label="校招流程" name="process" defaultValue="流程待核实" required />
             </AdminForm>
             <RecruitmentEditor
               items={data.recruitments.slice(0, 12)}
@@ -176,13 +176,13 @@ export function AdminDashboard({ data }: AdminProps) {
           <>
             <AdminForm title="新增岗位" onSubmit={(event) => submit(event, "/api/jobs")} pending={pending}>
               <CompanySelect companies={data.companies} />
-              <input name="title" placeholder="岗位名称 *" required />
-              <select name="direction" required defaultValue=""><option value="" disabled>岗位方向 *</option>{JOB_DIRECTIONS.map((item) => <option key={item}>{item}</option>)}</select>
-              <input name="city" placeholder="城市 *" required />
-              <input name="education" defaultValue="硕士及以上" required />
-              <input name="majorRequirement" placeholder="专业要求 *" required />
-              <input name="applyUrl" placeholder="投递链接（可空）" />
-              <input name="vehicleFitScore" type="number" min="0" max="100" defaultValue="85" required />
+              <input aria-label="岗位名称" name="title" placeholder="岗位名称 *" required />
+              <select aria-label="岗位方向" name="direction" required defaultValue=""><option value="" disabled>岗位方向 *</option>{JOB_DIRECTIONS.map((item) => <option key={item}>{item}</option>)}</select>
+              <input aria-label="岗位城市" name="city" placeholder="城市 *" required />
+              <input aria-label="学历要求" name="education" defaultValue="待核实" required />
+              <input aria-label="专业要求" name="majorRequirement" placeholder="专业要求 *" required />
+              <input aria-label="岗位投递链接" name="applyUrl" placeholder="投递链接（可空）" />
+              <input name="vehicleFitScore" type="hidden" value="0" />
             </AdminForm>
             <JobEditor
               items={data.jobs.slice(0, 12)}
@@ -196,12 +196,12 @@ export function AdminDashboard({ data }: AdminProps) {
           <>
             <AdminForm title="新增资料" onSubmit={(event) => submit(event, "/api/resources")} pending={pending}>
               <CompanySelect companies={data.companies} />
-              <input name="title" placeholder="资料标题 *" required />
-              <select name="type" required>{RESOURCE_TYPES.map((item) => <option key={item}>{item}</option>)}</select>
-              <select name="credibility" required>{CREDIBILITY_LEVELS.map((item) => <option key={item}>{item}</option>)}</select>
-              <input name="source" placeholder="资料来源 *" required />
-              <input name="url" placeholder="外部链接（可空）" />
-              <textarea name="summary" placeholder="资料简介 *" required />
+              <input aria-label="资料标题" name="title" placeholder="资料标题 *" required />
+              <select aria-label="资料类型" name="type" required>{RESOURCE_TYPES.map((item) => <option key={item}>{item}</option>)}</select>
+              <select aria-label="资料可信度" name="credibility" required>{CREDIBILITY_LEVELS.map((item) => <option key={item}>{item}</option>)}</select>
+              <input aria-label="资料来源" name="source" placeholder="资料来源 *" required />
+              <input aria-label="资料外部链接" name="url" placeholder="外部链接（可空）" />
+              <textarea aria-label="资料简介" name="summary" placeholder="资料简介 *" required />
             </AdminForm>
             <ResourceEditor
               items={data.resources.slice(0, 12)}
@@ -215,12 +215,12 @@ export function AdminDashboard({ data }: AdminProps) {
           <>
             <AdminForm title="新增日历事件" onSubmit={(event) => submit(event, "/api/calendar-events")} pending={pending}>
               <CompanySelect companies={data.companies} />
-              <select name="eventType" required>{CALENDAR_EVENT_TYPES.map((item) => <option key={item}>{item}</option>)}</select>
-              <input name="title" placeholder="事件标题 *" required />
-              <input name="eventDate" type="date" required />
-              <select name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
-              <select name="credibility" required defaultValue="待核实">{CREDIBILITY_LEVELS.map((item) => <option key={item}>{item}</option>)}</select>
-              <input name="sourceUrl" placeholder="来源链接（可空）" />
+              <select aria-label="日历事件类型" name="eventType" required>{CALENDAR_EVENT_TYPES.map((item) => <option key={item}>{item}</option>)}</select>
+              <input aria-label="日历事件标题" name="title" placeholder="事件标题 *" required />
+              <input aria-label="日历事件日期" name="eventDate" type="date" />
+              <select aria-label="日历事件状态" name="status" required defaultValue="待确认">{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
+              <select aria-label="日历事件可信度" name="credibility" required defaultValue="待核实">{CREDIBILITY_LEVELS.map((item) => <option key={item}>{item}</option>)}</select>
+              <input aria-label="日历事件来源链接" name="sourceUrl" placeholder="来源链接（可空）" />
             </AdminForm>
             <CalendarEventEditor
               items={data.calendarEvents.slice(0, 12)}
@@ -256,7 +256,7 @@ function AdminForm({
 
 function CompanySelect({ companies }: { companies: CompanyCardData[] }) {
   return (
-    <select name="companyId" defaultValue="" required>
+    <select aria-label="选择公司" name="companyId" defaultValue="" required>
       <option value="" disabled>选择公司 *</option>
       {companies.map((company) => <option key={company.id} value={company.id}>{company.name}</option>)}
     </select>
@@ -300,9 +300,9 @@ function CompanyEditorRow({ company, pending, onUpdate, onDelete }: {
   return (
     <tr>
       <td><strong>{company.name}</strong><small>{company.category}</small></td>
-      <td><select value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select></td>
-      <td><input value={officialWebsite} onChange={(event) => setOfficialWebsite(event.target.value)} placeholder="可空" /></td>
-      <td><input value={campusUrl} onChange={(event) => setCampusUrl(event.target.value)} placeholder="可空" /></td>
+      <td><select aria-label={`${company.name} 状态`} value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((item) => <option key={item}>{item}</option>)}</select></td>
+      <td><input aria-label={`${company.name} 公司官网`} value={officialWebsite} onChange={(event) => setOfficialWebsite(event.target.value)} placeholder="可空" /></td>
+      <td><input aria-label={`${company.name} 校招官网`} value={campusUrl} onChange={(event) => setCampusUrl(event.target.value)} placeholder="可空" /></td>
       <td><div className="table-actions">
         <button disabled={pending} onClick={() => onUpdate(company.id, { status, officialWebsite, campusUrl })}>保存</button>
         <button className="danger" disabled={pending} onClick={() => onDelete(company.id)}>删除</button>
@@ -336,12 +336,12 @@ function RecruitmentEditorRow({ item, pending, onUpdate }: {
   const [process, setProcess] = useState(item.process);
   return <tr>
     <td><strong>{item.companyName}</strong><small>{item.title}</small></td>
-    <td><select value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></td>
-    <td><input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></td>
-    <td><input value={applyUrl} onChange={(event) => setApplyUrl(event.target.value)} placeholder="可空" /></td>
-    <td><input value={process} onChange={(event) => setProcess(event.target.value)} /></td>
-    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { status, startDate, endDate, applyUrl, process })}>保存</button></td>
+    <td><select aria-label={`${item.companyName} 项目状态`} value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input aria-label={`${item.companyName} 开始日期`} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></td>
+    <td><input aria-label={`${item.companyName} 截止日期`} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></td>
+    <td><input aria-label={`${item.companyName} 投递链接`} value={applyUrl} onChange={(event) => setApplyUrl(event.target.value)} placeholder="可空" /></td>
+    <td><input aria-label={`${item.companyName} 招聘流程`} value={process} onChange={(event) => setProcess(event.target.value)} /></td>
+    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { status, startDate: startDate || null, endDate: endDate || null, applyUrl, process })}>保存</button></td>
   </tr>;
 }
 
@@ -351,7 +351,7 @@ function JobEditor({ items, pending, onUpdate }: {
   onUpdate: UpdateHandler;
 }) {
   return <div className="table-wrap"><table>
-    <thead><tr><th>公司 / 岗位</th><th>方向</th><th>城市</th><th>学历</th><th>专业要求</th><th>适配度</th><th>操作</th></tr></thead>
+    <thead><tr><th>公司 / 岗位</th><th>方向</th><th>城市</th><th>学历</th><th>专业要求</th><th>操作</th></tr></thead>
     <tbody>{items.map((item) => <JobEditorRow key={item.id} item={item} pending={pending} onUpdate={onUpdate} />)}</tbody>
   </table></div>;
 }
@@ -365,15 +365,13 @@ function JobEditorRow({ item, pending, onUpdate }: {
   const [city, setCity] = useState(item.city);
   const [education, setEducation] = useState(item.education);
   const [majorRequirement, setMajorRequirement] = useState(item.majorRequirement);
-  const [vehicleFitScore, setVehicleFitScore] = useState(item.vehicleFitScore);
   return <tr>
     <td><strong>{item.companyName}</strong><small>{item.title}</small></td>
-    <td><select value={direction} onChange={(event) => setDirection(event.target.value)}>{JOB_DIRECTIONS.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><input value={city} onChange={(event) => setCity(event.target.value)} /></td>
-    <td><input value={education} onChange={(event) => setEducation(event.target.value)} /></td>
-    <td><input value={majorRequirement} onChange={(event) => setMajorRequirement(event.target.value)} /></td>
-    <td><input type="number" min="0" max="100" value={vehicleFitScore} onChange={(event) => setVehicleFitScore(Number(event.target.value))} /></td>
-    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { direction, city, education, majorRequirement, vehicleFitScore })}>保存</button></td>
+    <td><select aria-label={`${item.companyName} 岗位方向`} value={direction} onChange={(event) => setDirection(event.target.value)}>{JOB_DIRECTIONS.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input aria-label={`${item.companyName} 岗位城市`} value={city} onChange={(event) => setCity(event.target.value)} /></td>
+    <td><input aria-label={`${item.companyName} 学历要求`} value={education} onChange={(event) => setEducation(event.target.value)} /></td>
+    <td><input aria-label={`${item.companyName} 专业要求`} value={majorRequirement} onChange={(event) => setMajorRequirement(event.target.value)} /></td>
+    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { direction, city, education, majorRequirement })}>保存</button></td>
   </tr>;
 }
 
@@ -399,10 +397,10 @@ function ResourceEditorRow({ item, pending, onUpdate }: {
   const [url, setUrl] = useState(item.url ?? "");
   return <tr>
     <td><strong>{item.companyName}</strong><small>{item.title}</small></td>
-    <td><select value={type} onChange={(event) => setType(event.target.value)}>{RESOURCE_TYPES.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><input value={source} onChange={(event) => setSource(event.target.value)} /></td>
-    <td><select value={credibility} onChange={(event) => setCredibility(event.target.value)}>{CREDIBILITY_LEVELS.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="可空" /></td>
+    <td><select aria-label={`${item.companyName} 资料类型`} value={type} onChange={(event) => setType(event.target.value)}>{RESOURCE_TYPES.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input aria-label={`${item.companyName} 资料来源`} value={source} onChange={(event) => setSource(event.target.value)} /></td>
+    <td><select aria-label={`${item.companyName} 资料可信度`} value={credibility} onChange={(event) => setCredibility(event.target.value)}>{CREDIBILITY_LEVELS.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input aria-label={`${item.companyName} 资料链接`} value={url} onChange={(event) => setUrl(event.target.value)} placeholder="可空" /></td>
     <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { type, source, credibility, url })}>保存</button></td>
   </tr>;
 }
@@ -424,17 +422,17 @@ function CalendarEventEditorRow({ item, pending, onUpdate }: {
   onUpdate: UpdateHandler;
 }) {
   const [eventType, setEventType] = useState(item.eventType);
-  const [eventDate, setEventDate] = useState(item.eventDate.slice(0, 10));
+  const [eventDate, setEventDate] = useState(item.eventDate?.slice(0, 10) ?? "");
   const [status, setStatus] = useState(item.status);
   const [credibility, setCredibility] = useState(item.credibility);
   const [sourceUrl, setSourceUrl] = useState(item.sourceUrl ?? "");
   return <tr>
     <td><strong>{item.companyName}</strong><small>{item.title}</small></td>
-    <td><select value={eventType} onChange={(event) => setEventType(event.target.value)}>{CALENDAR_EVENT_TYPES.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><input type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} /></td>
-    <td><select value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><select value={credibility} onChange={(event) => setCredibility(event.target.value)}>{CREDIBILITY_LEVELS.map((value) => <option key={value}>{value}</option>)}</select></td>
-    <td><input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="可空" /></td>
-    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { eventType, eventDate, status, credibility, sourceUrl })}>保存</button></td>
+    <td><select aria-label={`${item.companyName} 事件类型`} value={eventType} onChange={(event) => setEventType(event.target.value)}>{CALENDAR_EVENT_TYPES.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input aria-label={`${item.companyName} 事件日期`} type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} /></td>
+    <td><select aria-label={`${item.companyName} 事件状态`} value={status} onChange={(event) => setStatus(event.target.value)}>{RECRUITMENT_STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><select aria-label={`${item.companyName} 事件可信度`} value={credibility} onChange={(event) => setCredibility(event.target.value)}>{CREDIBILITY_LEVELS.map((value) => <option key={value}>{value}</option>)}</select></td>
+    <td><input aria-label={`${item.companyName} 事件来源`} value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="可空" /></td>
+    <td><button className="table-save" disabled={pending} onClick={() => onUpdate(item.id, { eventType, eventDate: eventDate || null, status, credibility, sourceUrl })}>保存</button></td>
   </tr>;
 }

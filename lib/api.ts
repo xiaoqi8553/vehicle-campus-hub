@@ -14,6 +14,16 @@ const optionalUrl = z
   .nullable()
   .optional();
 
+const sourceType = z.enum(["OFFICIAL", "SCHOOL", "PUBLIC", "EXPERIENCE", "UNKNOWN"]);
+const dateConfidence = z.enum(["VERIFIED", "ESTIMATED", "UNKNOWN"]);
+const evidenceFields = {
+  sourceUrl: optionalUrl,
+  sourceType: sourceType.optional(),
+  verifiedAt: z.coerce.date().nullable().optional(),
+  dateConfidence: dateConfidence.optional(),
+  changeSummary: z.string().trim().nullable().optional(),
+};
+
 export const companyInput = z.object({
   slug: z.string().trim().min(1).optional(),
   name: z.string().trim().min(1, "公司名称不能为空"),
@@ -25,6 +35,7 @@ export const companyInput = z.object({
   officialWebsite: optionalUrl,
   campusRecruitmentWebsite: optionalUrl,
   campusUrl: optionalUrl,
+  ...evidenceFields,
   cities: stringList,
   tags: stringList,
   vehicleDirections: stringList.optional(),
@@ -48,8 +59,7 @@ export const recruitmentInput = z.object({
   process: z.string().min(1),
   note: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
-  sourceUrl: optionalUrl,
-  sourceType: z.string().min(1).optional(),
+  ...evidenceFields,
   credibility: z.string().min(1),
 });
 
@@ -65,6 +75,7 @@ export const jobInput = z.object({
   majors: stringList.optional(),
   skills: stringList.optional(),
   applyUrl: optionalUrl,
+  ...evidenceFields,
   vehicleFitScore: z.coerce.number().int().min(0).max(100),
   matchScore: z.coerce.number().int().min(0).max(100).optional(),
 });
@@ -76,9 +87,8 @@ export const resourceInput = z.object({
   targetYear: z.coerce.number().int().min(2020).max(2100).optional(),
   sourceYear: z.coerce.number().int().min(2000).max(2100).optional(),
   url: optionalUrl,
-  sourceUrl: optionalUrl,
+  ...evidenceFields,
   source: z.string().min(1),
-  sourceType: z.string().min(1).optional(),
   summary: z.string().min(1),
   credibility: z.string().min(1),
   tags: stringList.optional(),
@@ -90,9 +100,9 @@ export const calendarEventInput = z.object({
   recruitmentId: z.string().nullable().optional(),
   title: z.string().min(1),
   eventType: z.string().min(1),
-  eventDate: z.coerce.date(),
+  eventDate: z.coerce.date().nullable().optional(),
   status: z.string().min(1),
-  sourceUrl: optionalUrl,
+  ...evidenceFields,
   credibility: z.string().min(1).optional(),
 });
 

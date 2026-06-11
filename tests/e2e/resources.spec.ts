@@ -29,7 +29,7 @@ test.describe("resources page", () => {
     await expect(cards).toHaveCount(1);
     await expect(cards.first()).toContainText("面经");
 
-    await page.getByLabel("可信度").selectOption("经验参考");
+    await page.getByLabel("可信度").selectOption("待核实");
     await expect(cards).toHaveCount(1);
     expect(await cards.count()).toBeLessThan(initialCount);
   });

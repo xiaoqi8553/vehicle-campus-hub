@@ -5,7 +5,7 @@ import type {
   Recruitment,
   Resource,
 } from "@prisma/client";
-import { parseStringList } from "@/lib/domain";
+import { normalizeSourceType, parseStringList, safeExternalUrl } from "@/lib/domain";
 import { prisma } from "@/lib/prisma";
 
 export type CompanyBaseData = ReturnType<typeof serializeCompany>;
@@ -21,6 +21,10 @@ export function serializeCompany(company: Company) {
     : parseStringList(company.fitDirections);
   const companyType = company.type || company.category;
   const campusRecruitmentWebsite = company.campusRecruitmentWebsite || company.campusUrl;
+  const sourceUrl = safeExternalUrl(company.sourceUrl)
+    ?? safeExternalUrl(campusRecruitmentWebsite)
+    ?? safeExternalUrl(company.officialWebsite);
+  const sourceType = normalizeSourceType(company.sourceType, sourceUrl);
 
   return {
     ...company,
@@ -30,11 +34,14 @@ export function serializeCompany(company: Company) {
     category: companyType,
     campusRecruitmentWebsite,
     campusUrl: campusRecruitmentWebsite,
+    sourceUrl,
+    sourceType,
     cities: parseStringList(company.cities),
     tags: parseStringList(company.tags),
     vehicleDirections,
     fitDirections: vehicleDirections,
     lastVerifiedAt: company.lastVerifiedAt?.toISOString() ?? null,
+    verifiedAt: company.verifiedAt?.toISOString() ?? null,
     lastUpdatedAt: company.lastUpdatedAt.toISOString(),
     createdAt: company.createdAt.toISOString(),
     updatedAt: company.updatedAt.toISOString(),
@@ -42,13 +49,18 @@ export function serializeCompany(company: Company) {
 }
 
 export function serializeRecruitment(recruitment: Recruitment) {
+  const sourceUrl = safeExternalUrl(recruitment.sourceUrl);
+  const sourceType = normalizeSourceType(recruitment.sourceType, sourceUrl);
   return {
     ...recruitment,
     targetYear: recruitment.targetYear ?? recruitment.year,
     batch: recruitment.batch || recruitment.season,
     season: recruitment.batch || recruitment.season,
     notes: recruitment.notes || recruitment.note || null,
-    sourceType: recruitment.sourceType || "公开整理",
+    sourceUrl,
+    sourceType,
+    credibility: sourceType === "UNKNOWN" ? "待核实" : recruitment.credibility,
+    verifiedAt: recruitment.verifiedAt?.toISOString() ?? null,
     startDate: recruitment.startDate?.toISOString() ?? null,
     endDate: recruitment.endDate?.toISOString() ?? null,
     createdAt: recruitment.createdAt.toISOString(),
@@ -57,11 +69,15 @@ export function serializeRecruitment(recruitment: Recruitment) {
 }
 
 export function serializeJob(job: Job) {
+  const sourceUrl = safeExternalUrl(job.sourceUrl);
   return {
     ...job,
     programId: job.programId || job.recruitmentId,
     majors: parseStringList(job.majors),
     skills: parseStringList(job.skills),
+    sourceUrl,
+    sourceType: normalizeSourceType(job.sourceType, sourceUrl),
+    verifiedAt: job.verifiedAt?.toISOString() ?? null,
     matchScore: job.matchScore ?? job.vehicleFitScore,
     vehicleFitScore: job.matchScore ?? job.vehicleFitScore,
     createdAt: job.createdAt.toISOString(),
@@ -70,25 +86,38 @@ export function serializeJob(job: Job) {
 }
 
 export function serializeResource(resource: Resource) {
+  const sourceUrl = safeExternalUrl(resource.sourceUrl || resource.url);
+  const sourceType = normalizeSourceType(resource.sourceType || resource.source, sourceUrl);
   return {
     ...resource,
-    sourceUrl: resource.sourceUrl || resource.url,
-    url: resource.sourceUrl || resource.url,
-    sourceType: resource.sourceType || resource.source,
+    sourceUrl,
+    url: sourceUrl,
+    sourceType,
+    credibility: sourceType === "UNKNOWN" ? "待核实" : resource.credibility,
     tags: parseStringList(resource.tags),
     targetYear: resource.targetYear ?? 2027,
     sourceYear: resource.sourceYear ?? 2026,
     lastVerifiedAt: resource.lastVerifiedAt?.toISOString() ?? null,
+    verifiedAt: resource.verifiedAt?.toISOString() ?? null,
     createdAt: resource.createdAt.toISOString(),
     updatedAt: resource.updatedAt.toISOString(),
   };
 }
 
 export function serializeCalendarEvent(event: CalendarEvent) {
+  const sourceUrl = safeExternalUrl(event.sourceUrl);
+  const sourceType = normalizeSourceType(event.sourceType, sourceUrl);
   return {
     ...event,
     programId: event.programId || event.recruitmentId,
-    eventDate: event.eventDate.toISOString(),
+    eventDate: event.eventDate?.toISOString() ?? null,
+    sourceUrl,
+    sourceType,
+    status: sourceType === "UNKNOWN" || event.dateConfidence !== "VERIFIED"
+      ? "待确认"
+      : event.status,
+    credibility: sourceType === "UNKNOWN" ? "待核实" : event.credibility,
+    verifiedAt: event.verifiedAt?.toISOString() ?? null,
     createdAt: event.createdAt.toISOString(),
     updatedAt: event.updatedAt.toISOString(),
   };

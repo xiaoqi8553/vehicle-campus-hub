@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
 import type { CompanyCardData } from "@/lib/data";
 import { ExternalLink } from "@/components/ui/external-link";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { sourceTypeLabel } from "@/lib/domain";
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "待确认";
@@ -39,7 +40,12 @@ export function CompanyCard({ company }: { company: CompanyCardData }) {
       </div>
       <div className="company-meta">
         <span><MapPin size={14} />{company.cities.join(" / ") || "城市待确认"}</span>
-        <span><CalendarDays size={14} />{formatDate(program?.startDate)} 开始 / {formatDate(program?.endDate)} 截止</span>
+        <span>
+          <CalendarDays size={14} />
+          {program?.dateConfidence === "VERIFIED"
+            ? `${formatDate(program.startDate)} 开始 / ${formatDate(program.endDate)} 截止`
+            : "日期待确认"}
+        </span>
         <span><CheckCircle2 size={14} />{company.dataStatus}</span>
       </div>
       <div className="tag-row">
@@ -48,7 +54,13 @@ export function CompanyCard({ company }: { company: CompanyCardData }) {
       <div>
         <p className="mini-label">2027届信息状态</p>
         <p className="direction-copy">
-          {program?.credibility ?? "待核实"} · {program?.sourceType ?? "公开整理"} · 更新于 {formatFullDate(company.lastUpdatedAt)}
+          {program?.credibility ?? "待核实"}
+          {" · "}
+          {sourceTypeLabel(program?.sourceType)}
+          {" · "}
+          内容更新 {formatFullDate(company.lastUpdatedAt)}
+          {" · "}
+          最后核验 {company.verifiedAt ? formatFullDate(company.verifiedAt) : "待补充"}
         </p>
       </div>
       <div className="company-actions">
