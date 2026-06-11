@@ -3,10 +3,10 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="shell footer-inner">
         <div>
-          <strong>Vehicle Campus Hub</strong>
-          <p>车辆行业垂直校招信息聚合平台</p>
+          <strong>Vehicle Campus Hub <span>v2.0.0</span></strong>
+          <p>2027届车辆行业招聘情报台</p>
         </div>
-        <p>本平台信息为聚合整理，具体以企业官方招聘网站为准。</p>
+        <p>只发布可追溯来源；未核验信息保持未知。最后结构更新：2026-06-11。</p>
       </div>
     </footer>
   );

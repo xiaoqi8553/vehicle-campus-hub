@@ -1,0 +1,51 @@
+[
+  {
+    "name": "home",
+    "route": "/",
+    "h1": 1,
+    "articles": 20,
+    "height": 4937
+  },
+  {
+    "name": "companies",
+    "route": "/companies",
+    "h1": 1,
+    "articles": 25,
+    "height": 3882
+  },
+  {
+    "name": "xiaomi",
+    "route": "/companies/xiaomi-auto",
+    "h1": 1,
+    "articles": 9,
+    "height": 3610
+  },
+  {
+    "name": "calendar",
+    "route": "/calendar",
+    "h1": 1,
+    "articles": 25,
+    "height": 4089
+  },
+  {
+    "name": "resources",
+    "route": "/resources",
+    "h1": 1,
+    "articles": 54,
+    "height": 8125
+  },
+  {
+    "name": "about",
+    "route": "/about",
+    "h1": 1,
+    "articles": 6,
+    "height": 1658
+  },
+  {
+    "name": "home-mobile",
+    "route": "/",
+    "h1": 1,
+    "articles": 20,
+    "height": 9672
+  }
+]

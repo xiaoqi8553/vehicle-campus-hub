@@ -1,0 +1,4 @@
+docs/screenshots/
+test-results/
+playwright-report/
+playwright-report-production/

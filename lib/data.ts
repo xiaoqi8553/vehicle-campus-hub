@@ -21,8 +21,9 @@ export function serializeCompany(company: Company) {
     : parseStringList(company.fitDirections);
   const companyType = company.type || company.category;
   const campusRecruitmentWebsite = company.campusRecruitmentWebsite || company.campusUrl;
+  const recruitmentWebsite = company.recruitmentWebsite || campusRecruitmentWebsite;
   const sourceUrl = safeExternalUrl(company.sourceUrl)
-    ?? safeExternalUrl(campusRecruitmentWebsite)
+    ?? safeExternalUrl(recruitmentWebsite)
     ?? safeExternalUrl(company.officialWebsite);
   const sourceType = normalizeSourceType(company.sourceType, sourceUrl);
 
@@ -32,6 +33,7 @@ export function serializeCompany(company: Company) {
     shortName: company.shortName || company.name,
     type: companyType,
     category: companyType,
+    recruitmentWebsite,
     campusRecruitmentWebsite,
     campusUrl: campusRecruitmentWebsite,
     sourceUrl,
@@ -169,7 +171,7 @@ export async function getResources() {
   });
   return resources.map((resource) => ({
     ...serializeResource(resource),
-    company: serializeCompany(resource.company),
+    company: resource.company ? serializeCompany(resource.company) : null,
   }));
 }
 
@@ -205,7 +207,7 @@ export async function getAdminData() {
     })),
     resources: resources.map((item) => ({
       ...serializeResource(item),
-      companyName: item.company.name,
+      companyName: item.company?.name ?? "公共资料",
     })),
     calendarEvents: calendarEvents.map((item) => ({
       ...serializeCalendarEvent(item),

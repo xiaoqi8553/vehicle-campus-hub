@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Gauge, Menu } from "lucide-react";
+import { Crosshair, Menu } from "lucide-react";
 
 const navItems = [
   { href: "/companies", label: "公司库" },
@@ -17,8 +17,8 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="shell header-inner">
         <Link href="/" className="brand" aria-label="Vehicle Campus Hub 首页">
-          <span className="brand-mark"><Gauge size={20} /></span>
-          <span>Vehicle Campus Hub</span>
+          <span className="brand-mark"><Crosshair size={19} /></span>
+          <span><strong>VCH</strong><small>Vehicle Campus Hub</small></span>
         </Link>
         <nav className="desktop-nav" aria-label="主导航">
           {items.map((item) => (

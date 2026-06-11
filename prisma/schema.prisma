@@ -17,6 +17,7 @@ model Company {
   category                 String
   description              String
   officialWebsite          String?
+  recruitmentWebsite       String?
   campusRecruitmentWebsite String?
   campusUrl                String?
   sourceUrl                String?
@@ -102,7 +103,7 @@ model Job {
 
 model Resource {
   id             String    @id @default(cuid())
-  companyId      String
+  companyId      String?
   title          String
   type           String
   targetYear     Int?
@@ -120,7 +121,7 @@ model Resource {
   lastVerifiedAt DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company        Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@index([companyId])
 }

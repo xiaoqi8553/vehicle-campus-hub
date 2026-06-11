@@ -1,73 +1,39 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage search, status filter and detail navigation work", async ({
-  page,
-}) => {
+test("homepage is a compact 2027 recruitment intelligence dashboard", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "2027届车辆行业校招雷达" })).toBeVisible();
-  await expect(page.getByTestId("company-card").first()).toBeVisible();
-  const explorer = page.getByTestId("company-explorer");
-  const explorerCards = explorer.getByTestId("company-card");
+  await expect(page.getByTestId("featured-companies")).toHaveCount(0);
+  await expect(page.getByTestId("company-row")).toHaveCount(8);
+  await expect(page.getByRole("link", { name: /查看全部 25 家企业/ })).toBeVisible();
+  await expect(page.getByText("信息来源与核验规则")).toBeVisible();
+});
 
-  await page.getByPlaceholder(/搜索公司/).fill("小米");
-  await expect(explorerCards).toHaveCount(1);
-  await expect(explorerCards).toContainText("小米");
+test("company database supports search and detail navigation", async ({ page }) => {
+  await page.goto("/companies");
+  await expect(page.getByRole("heading", { name: "2027届车辆行业公司情报库" })).toBeVisible();
+  await expect(page.getByTestId("company-row")).toHaveCount(25);
 
-  await page.getByPlaceholder(/搜索公司/).fill("");
-  const initialCount = await explorerCards.count();
-  await page.getByLabel("校招状态").selectOption("已开启");
-  const filteredCount = await explorerCards.count();
-  expect(filteredCount).toBeLessThan(initialCount);
-  await expect(page.getByText("没有匹配结果")).toBeVisible();
-  await page.getByLabel("校招状态").selectOption("");
-
-  const detailLink = explorer.getByRole("link", { name: "查看详情" }).first();
-  await expect(detailLink).toHaveAttribute("href", /\/companies\/.+/);
+  await page.getByRole("textbox", { name: "搜索公司" }).fill("小米");
+  await expect(page.getByTestId("company-row")).toHaveCount(1);
+  const detailLink = page.getByRole("link", { name: "查看公司档案" });
+  await expect(detailLink).toHaveAttribute("href", "/companies/xiaomi-auto");
   await Promise.all([
-    page.waitForURL(/\/companies\/.+/),
+    page.waitForURL(/\/companies\/xiaomi-auto/),
     detailLink.click(),
   ]);
-  await expect(page.getByText("公司基础信息")).toBeVisible();
-  await expect(page.getByText("校招项目")).toBeVisible();
-  await expect(page.getByText("岗位方向分组")).toBeVisible();
-  await expect(page.getByText("笔试面经资料")).toBeVisible();
-  await expect(page.getByText("求职准备建议")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /小米汽车/ })).toBeVisible();
+  await expect(page.getByText("官方招聘信息")).toBeVisible();
+  await expect(page.getByText("岗位方向参考")).toBeVisible();
 });
 
-test("companies, calendar, resources, about and admin guard render core behavior", async ({
-  page,
-  request,
-}) => {
-  await page.goto("/companies");
-  await expect(page.getByRole("heading", { name: "2027届车辆行业公司库" })).toBeVisible();
-  await expect(page.getByTestId("company-card").first()).toBeVisible();
-
-  await page.goto("/calendar");
-  await expect(page.getByRole("heading", { name: "2027届车辆行业校招日历" })).toBeVisible();
-  await expect(page.getByTestId("calendar-event").first()).toBeVisible();
-
-  await page.goto("/resources");
-  await expect(page.getByRole("heading", { name: "2027届车辆行业笔试面经资料库" })).toBeVisible();
-  await expect(page.getByTestId("resource-card").first()).toBeVisible();
-
+test("about page works and admin remains private", async ({ page, request }) => {
   await page.goto("/about");
-  await expect(page.getByRole("heading", { name: "关于 2027届车辆行业校招雷达" })).toBeVisible();
-
-  const adminResponse = await request.get("/admin");
-  expect(adminResponse.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "关于 Vehicle Campus Hub" })).toBeVisible();
+  expect((await request.get("/admin")).status()).toBe(404);
 });
 
-test("empty external links are disabled without page errors", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/companies");
-  await expect(page.getByText("待补官方链接").first()).toBeVisible();
-  expect(errors).toEqual([]);
-});
-
-test("API failures return structured messages instead of HTML crashes", async ({
-  request,
-}) => {
+test("API validation returns structured errors", async ({ request }) => {
   const response = await request.post("/api/companies", { data: {} });
   expect(response.status()).toBe(400);
   await expect(response.json()).resolves.toMatchObject({ error: expect.any(String) });

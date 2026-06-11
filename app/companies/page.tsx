@@ -15,9 +15,9 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
     return (
       <div className="shell page-space">
         <div className="page-heading">
-          <p className="eyebrow">2027 COMPANY DATABASE / {companies.length} RECORDS</p>
-          <h1>2027届车辆行业公司库</h1>
-          <p>按公司类型、校招状态、车辆方向、城市、可信度和官方链接完整筛选。没有官方投递入口的企业会明确显示“待补官方链接”。</p>
+          <p className="eyebrow">COMPANY INTELLIGENCE / {companies.length} RECORDS</p>
+          <h1>2027届车辆行业公司情报库</h1>
+          <p>招聘官网、2027 项目证据和核验状态分开记录。官网存在不代表当前批次已经开放。</p>
         </div>
         <CompanyExplorer
           companies={companies}
@@ -28,7 +28,6 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
             status: first(params.status),
             direction: first(params.direction),
             city: first(params.city),
-            credibility: first(params.credibility),
             hasOfficialLink: first(params.official),
             sort: first(params.sort) || "updated",
           }}

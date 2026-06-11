@@ -26,7 +26,7 @@ export default function AboutPage() {
     <div className="shell page-space about-page">
       <div className="page-heading">
         <p className="eyebrow">ABOUT VEHICLE CAMPUS HUB</p>
-        <h1>关于 2027届车辆行业校招雷达</h1>
+        <h1>关于 Vehicle Campus Hub</h1>
         <p>Vehicle Campus Hub 是面向 2027 届车辆行业求职学生的信息聚合平台，优先整理官方投递入口、校招时间线、岗位方向、来源可信度和笔试面经准备资料。</p>
       </div>
 
