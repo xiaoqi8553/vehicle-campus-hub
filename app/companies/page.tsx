@@ -5,7 +5,7 @@ import { getCompanies } from "@/lib/data";
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function first(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 }
 
 export default async function CompaniesPage({ searchParams }: { searchParams: SearchParams }) {
@@ -17,7 +17,9 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
         <div className="page-heading">
           <p className="eyebrow">COMPANY INTELLIGENCE / {companies.length} RECORDS</p>
           <h1>2027届车辆行业公司情报库</h1>
-          <p>默认按明确开放项目、最近核验时间和公司名排序。每行只保留一个主入口，其余证据收进来源列表。</p>
+          <p>
+            默认按明确开放项目、最近核验时间和公司名排序。每行只保留一个主入口，其余证据收进来源列表。
+          </p>
         </div>
         <CompanyExplorer
           companies={companies}
@@ -35,6 +37,10 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
       </div>
     );
   } catch {
-    return <div className="shell page-space"><DataState /></div>;
+    return (
+      <div className="shell page-space">
+        <DataState />
+      </div>
+    );
   }
 }

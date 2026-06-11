@@ -38,8 +38,22 @@ export const JOB_DIRECTIONS = [
 
 export const RESOURCE_TYPES = ["笔试", "面经", "测评", "简历", "投递攻略"] as const;
 export const CREDIBILITY_LEVELS = ["官方", "较可信", "经验参考", "待核实"] as const;
-export const DATA_STATUSES = ["入口可用", "访问受限", "待复核", "已核验", "待核实", "缺链接", "过期"] as const;
-export const SOURCE_TYPES = ["官方招聘站", "官方公众号", "学校就业网", "公开整理", "候选人经验"] as const;
+export const DATA_STATUSES = [
+  "入口可用",
+  "访问受限",
+  "待复核",
+  "已核验",
+  "待核实",
+  "缺链接",
+  "过期",
+] as const;
+export const SOURCE_TYPES = [
+  "官方招聘站",
+  "官方公众号",
+  "学校就业网",
+  "公开整理",
+  "候选人经验",
+] as const;
 export const CALENDAR_EVENT_TYPES = ["网申开始", "网申截止", "笔试", "面试", "宣讲会"] as const;
 export const RESOURCE_TAGS = [
   "自动驾驶",

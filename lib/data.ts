@@ -43,9 +43,10 @@ export function serializeCompany(company: Company) {
   const companyType = company.type || company.category;
   const campusRecruitmentWebsite = company.campusRecruitmentWebsite || company.campusUrl;
   const recruitmentWebsite = company.recruitmentWebsite || campusRecruitmentWebsite;
-  const sourceUrl = safeExternalUrl(company.sourceUrl)
-    ?? safeExternalUrl(recruitmentWebsite)
-    ?? safeExternalUrl(company.officialWebsite);
+  const sourceUrl =
+    safeExternalUrl(company.sourceUrl) ??
+    safeExternalUrl(recruitmentWebsite) ??
+    safeExternalUrl(company.officialWebsite);
   const sourceType = normalizeSourceType(company.sourceType, sourceUrl);
 
   return {
@@ -144,9 +145,8 @@ export function serializeCalendarEvent(event: CalendarEvent) {
     eventDate: event.eventDate?.toISOString() ?? null,
     sourceUrl,
     sourceType,
-    status: sourceType === "UNKNOWN" || event.dateConfidence !== "VERIFIED"
-      ? "待确认"
-      : event.status,
+    status:
+      sourceType === "UNKNOWN" || event.dateConfidence !== "VERIFIED" ? "待确认" : event.status,
     credibility: sourceType === "UNKNOWN" ? "待核实" : event.credibility,
     verifiedAt: event.verifiedAt?.toISOString() ?? null,
     createdAt: event.createdAt.toISOString(),
@@ -165,47 +165,51 @@ export async function getCompanies() {
     },
     orderBy: { name: "asc" },
   });
-  return companies.map((company) => ({
-    ...serializeCompany(company),
-    links: company.links.map(serializeCompanyLink),
-    recruitments: company.recruitments.map((recruitment) => ({
-      ...serializeRecruitment(recruitment),
-      sourceLink: recruitment.sourceLink ? serializeCompanyLink(recruitment.sourceLink) : null,
-    })),
-  })).sort((a, b) => {
-    const aOpen = a.links.some((link) => isCohortEvidence(link, 2027))
-      && a.recruitments.some((item) => item.targetYear === 2027 && item.status.includes("开放"));
-    const bOpen = b.links.some((link) => isCohortEvidence(link, 2027))
-      && b.recruitments.some((item) => item.targetYear === 2027 && item.status.includes("开放"));
-    if (aOpen !== bOpen) return Number(bOpen) - Number(aOpen);
-    const latest = (links: CompanyLinkData[]) => Math.max(
-      0,
-      ...links.map((link) => link.verifiedAt ? Date.parse(link.verifiedAt) : 0),
-    );
-    return latest(b.links) - latest(a.links) || a.name.localeCompare(b.name, "zh-CN");
-  });
+  return companies
+    .map((company) => ({
+      ...serializeCompany(company),
+      links: company.links.map(serializeCompanyLink),
+      recruitments: company.recruitments.map((recruitment) => ({
+        ...serializeRecruitment(recruitment),
+        sourceLink: recruitment.sourceLink ? serializeCompanyLink(recruitment.sourceLink) : null,
+      })),
+    }))
+    .sort((a, b) => {
+      const aOpen =
+        a.links.some((link) => isCohortEvidence(link, 2027)) &&
+        a.recruitments.some((item) => item.targetYear === 2027 && item.status.includes("开放"));
+      const bOpen =
+        b.links.some((link) => isCohortEvidence(link, 2027)) &&
+        b.recruitments.some((item) => item.targetYear === 2027 && item.status.includes("开放"));
+      if (aOpen !== bOpen) return Number(bOpen) - Number(aOpen);
+      const latest = (links: CompanyLinkData[]) =>
+        Math.max(0, ...links.map((link) => (link.verifiedAt ? Date.parse(link.verifiedAt) : 0)));
+      return latest(b.links) - latest(a.links) || a.name.localeCompare(b.name, "zh-CN");
+    });
 }
 
 export async function getCompanyDetail(id: string) {
-  const company = await prisma.company.findUnique({
-    where: { id },
-    include: {
-      links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
-      recruitments: { include: { sourceLink: true }, orderBy: { startDate: "desc" } },
-      jobs: { orderBy: { vehicleFitScore: "desc" } },
-      resources: { orderBy: { createdAt: "desc" } },
-      calendarEvents: { orderBy: { eventDate: "asc" } },
-    },
-  }) ?? await prisma.company.findUnique({
-    where: { slug: id },
-    include: {
-      links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
-      recruitments: { include: { sourceLink: true }, orderBy: { startDate: "desc" } },
-      jobs: { orderBy: { vehicleFitScore: "desc" } },
-      resources: { orderBy: { createdAt: "desc" } },
-      calendarEvents: { orderBy: { eventDate: "asc" } },
-    },
-  });
+  const company =
+    (await prisma.company.findUnique({
+      where: { id },
+      include: {
+        links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
+        recruitments: { include: { sourceLink: true }, orderBy: { startDate: "desc" } },
+        jobs: { orderBy: { vehicleFitScore: "desc" } },
+        resources: { orderBy: { createdAt: "desc" } },
+        calendarEvents: { orderBy: { eventDate: "asc" } },
+      },
+    })) ??
+    (await prisma.company.findUnique({
+      where: { slug: id },
+      include: {
+        links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
+        recruitments: { include: { sourceLink: true }, orderBy: { startDate: "desc" } },
+        jobs: { orderBy: { vehicleFitScore: "desc" } },
+        resources: { orderBy: { createdAt: "desc" } },
+        calendarEvents: { orderBy: { eventDate: "asc" } },
+      },
+    }));
   if (!company) return null;
   return {
     ...serializeCompany(company),

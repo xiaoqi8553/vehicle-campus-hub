@@ -13,6 +13,7 @@
 ### Task 1: 工程与测试基线
 
 **Files:**
+
 - Create: `package.json`
 - Create: `vitest.config.ts`
 - Create: `playwright.config.ts`
@@ -26,6 +27,7 @@
 ### Task 2: 数据层与领域函数
 
 **Files:**
+
 - Create: `prisma/schema.prisma`
 - Create: `prisma/seed.ts`
 - Create: `lib/prisma.ts`
@@ -41,6 +43,7 @@
 ### Task 3: API
 
 **Files:**
+
 - Create: `app/api/companies/route.ts`
 - Create: `app/api/companies/[id]/route.ts`
 - Create: `app/api/recruitments/route.ts`
@@ -55,6 +58,7 @@
 ### Task 4: 公共界面
 
 **Files:**
+
 - Create: `app/layout.tsx`
 - Create: `app/globals.css`
 - Create: `app/page.tsx`
@@ -73,6 +77,7 @@
 ### Task 5: 后台管理
 
 **Files:**
+
 - Create: `app/admin/page.tsx`
 - Create: `components/admin/admin-dashboard.tsx`
 

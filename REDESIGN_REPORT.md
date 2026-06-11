@@ -83,45 +83,45 @@ Tesla 与 Mercedes-Benz 在自动化环境中返回 403。这一结果被用于�
 
 使用真实 Chromium 页面访问核验 51 条链接，没有只依赖 HEAD 请求。
 
-| 状态 | 数量 |
-| --- | ---: |
-| 可正常访问 | 27 |
-| 已重定向 | 11 |
-| 被反爬拦截 | 7 |
-| 待人工确认 | 4 |
-| 仅浏览器可访问 | 1 |
-| 已失效 | 1 |
+| 状态           | 数量 |
+| -------------- | ---: |
+| 可正常访问     |   27 |
+| 已重定向       |   11 |
+| 被反爬拦截     |    7 |
+| 待人工确认     |    4 |
+| 仅浏览器可访问 |    1 |
+| 已失效         |    1 |
 
 招聘入口与项目深链：
 
-| 企业 | 链接类型 | 健康状态 | HTTP | URL |
-| --- | --- | --- | ---: | --- |
-| Momenta | 招聘入口 | 已重定向 | 200 | <https://momenta.jobs.feishu.cn/campus/m/> |
-| 比亚迪 | 招聘入口 | 已重定向 | 200 | <https://job.byd.com/portal/mobile/school-home> |
-| 博世 | 招聘入口 | 可正常访问 | 200 | <https://www.bosch.com.cn/careers/> |
-| 采埃孚 | 招聘入口 | 可正常访问 | 200 | <https://jobs.zf.com/?locale=zh_CN> |
-| 大陆集团 | 招聘入口 | 可正常访问 | 200 | <https://www.continental.com/en/career/> |
-| 地平线 | 招聘入口 | 可正常访问 | 200 | <https://horizon-campus.hotjob.cn/> |
-| 电装 | 招聘入口 | 被反爬拦截 | 403 | <https://www.denso.com/cn/zh/careers/> |
-| 东风汽车 | 招聘入口 | 可正常访问 | 200 | <https://dfmc.hotjob.cn/> |
-| 广汽集团 | 招聘入口 | 可正常访问 | 200 | <https://www.gacgroup.com/cn/talent> |
-| 禾赛科技 | 招聘入口 | 可正常访问 | 200 | <https://www.hesaitech.com/cn/careers> |
-| 吉利汽车 | 招聘入口 | 已重定向 | 200 | <https://campus.geely.com/> |
-| 极氪 | 招聘入口 | 可正常访问 | 200 | <https://www.zeekrgroup.com/join-us> |
-| 经纬恒润 | 招聘入口 | 被反爬拦截 | 403 | <https://www.hirain.com/news/%E6%A0%A1%E5%9B%AD%E6%8B%9B%E8%81%98-16> |
-| 理想汽车 | 招聘入口 | 已重定向 | 200 | <https://www.lixiang.com/employ/campus.html> |
-| 零跑汽车 | 招聘入口 | 可正常访问 | 200 | <https://leapmotor1.zhiye.com/campus> |
-| 宁德时代 | 招聘入口 | 待人工确认 | - | <https://career.catl.com/> |
-| 上汽集团 | 招聘入口 | 已重定向 | 200 | <https://saic-recruit.saicmotor.com/> |
-| 特斯拉 | 招聘入口 | 被反爬拦截 | 403 | <https://www.tesla.cn/careers> |
-| 蔚来 | 招聘入口 | 已重定向 | 200 | <https://campus.nio.com/> |
-| 小米汽车 | 历史项目深链 | 已失效 | 404 | <https://hr.xiaomi.com/campus/0> |
-| 小米汽车 | 校园招聘门户 | 可正常访问 | 200 | <https://hr.xiaomi.com/campus> |
-| 小鹏汽车 | 招聘入口 | 可正常访问 | 200 | <https://xiaopeng.jobs.feishu.cn/campus/> |
-| 长安汽车 | 招聘入口 | 可正常访问 | 200 | <https://changan.zhiye.com/Campus> |
-| 长城汽车 | 招聘入口 | 已重定向 | 200 | <https://zhaopin.gwm.cn/> |
-| 中创新航 | 招聘入口 | 可正常访问 | 200 | <https://calbjs.zhiye.com/campus> |
-| 中国一汽 | 招聘入口 | 待人工确认 | - | <https://faw-zhaopin.hotjob.cn/> |
+| 企业     | 链接类型     | 健康状态   | HTTP | URL                                                                   |
+| -------- | ------------ | ---------- | ---: | --------------------------------------------------------------------- |
+| Momenta  | 招聘入口     | 已重定向   |  200 | <https://momenta.jobs.feishu.cn/campus/m/>                            |
+| 比亚迪   | 招聘入口     | 已重定向   |  200 | <https://job.byd.com/portal/mobile/school-home>                       |
+| 博世     | 招聘入口     | 可正常访问 |  200 | <https://www.bosch.com.cn/careers/>                                   |
+| 采埃孚   | 招聘入口     | 可正常访问 |  200 | <https://jobs.zf.com/?locale=zh_CN>                                   |
+| 大陆集团 | 招聘入口     | 可正常访问 |  200 | <https://www.continental.com/en/career/>                              |
+| 地平线   | 招聘入口     | 可正常访问 |  200 | <https://horizon-campus.hotjob.cn/>                                   |
+| 电装     | 招聘入口     | 被反爬拦截 |  403 | <https://www.denso.com/cn/zh/careers/>                                |
+| 东风汽车 | 招聘入口     | 可正常访问 |  200 | <https://dfmc.hotjob.cn/>                                             |
+| 广汽集团 | 招聘入口     | 可正常访问 |  200 | <https://www.gacgroup.com/cn/talent>                                  |
+| 禾赛科技 | 招聘入口     | 可正常访问 |  200 | <https://www.hesaitech.com/cn/careers>                                |
+| 吉利汽车 | 招聘入口     | 已重定向   |  200 | <https://campus.geely.com/>                                           |
+| 极氪     | 招聘入口     | 可正常访问 |  200 | <https://www.zeekrgroup.com/join-us>                                  |
+| 经纬恒润 | 招聘入口     | 被反爬拦截 |  403 | <https://www.hirain.com/news/%E6%A0%A1%E5%9B%AD%E6%8B%9B%E8%81%98-16> |
+| 理想汽车 | 招聘入口     | 已重定向   |  200 | <https://www.lixiang.com/employ/campus.html>                          |
+| 零跑汽车 | 招聘入口     | 可正常访问 |  200 | <https://leapmotor1.zhiye.com/campus>                                 |
+| 宁德时代 | 招聘入口     | 待人工确认 |    - | <https://career.catl.com/>                                            |
+| 上汽集团 | 招聘入口     | 已重定向   |  200 | <https://saic-recruit.saicmotor.com/>                                 |
+| 特斯拉   | 招聘入口     | 被反爬拦截 |  403 | <https://www.tesla.cn/careers>                                        |
+| 蔚来     | 招聘入口     | 已重定向   |  200 | <https://campus.nio.com/>                                             |
+| 小米汽车 | 历史项目深链 | 已失效     |  404 | <https://hr.xiaomi.com/campus/0>                                      |
+| 小米汽车 | 校园招聘门户 | 可正常访问 |  200 | <https://hr.xiaomi.com/campus>                                        |
+| 小鹏汽车 | 招聘入口     | 可正常访问 |  200 | <https://xiaopeng.jobs.feishu.cn/campus/>                             |
+| 长安汽车 | 招聘入口     | 可正常访问 |  200 | <https://changan.zhiye.com/Campus>                                    |
+| 长城汽车 | 招聘入口     | 已重定向   |  200 | <https://zhaopin.gwm.cn/>                                             |
+| 中创新航 | 招聘入口     | 可正常访问 |  200 | <https://calbjs.zhiye.com/campus>                                     |
+| 中国一汽 | 招聘入口     | 待人工确认 |    - | <https://faw-zhaopin.hotjob.cn/>                                      |
 
 完整浏览器响应、最终 URL、页面标题与正文摘要见 `docs/audit/link-health-2026-06-11/link-audit.json`。
 
@@ -183,13 +183,13 @@ Tesla 与 Mercedes-Benz 在自动化环境中返回 403。这一结果被用于�
 
 ## 7. 最终测试
 
-| 命令 | 结果 |
-| --- | --- |
-| `npm run test:unit` | 通过，13/13 |
-| `npm run typecheck` | 通过 |
-| `npm run lint` | 通过 |
-| `npm run build` | 通过，15 个页面完成构建 |
-| `npm run test:e2e` | 通过，50 passed / 2 skipped |
+| 命令                  | 结果                                          |
+| --------------------- | --------------------------------------------- |
+| `npm run test:unit`   | 通过，13/13                                   |
+| `npm run typecheck`   | 通过                                          |
+| `npm run lint`        | 通过                                          |
+| `npm run build`       | 通过，15 个页面完成构建                       |
+| `npm run test:e2e`    | 通过，50 passed / 2 skipped                   |
 | `npm run prisma:seed` | 通过，25 企业 / 51 链接 / 3 项目 / 6 完整资源 |
 
 两个 skipped 用例是同一套四视口矩阵和 44px 检查在 `mobile` Playwright 项目中主动跳过，已在 `chromium` 项目内完整执行。

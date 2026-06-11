@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage prioritizes search and keeps the mobile company list short", async ({ page }, testInfo) => {
+test("homepage prioritizes search and keeps the mobile company list short", async ({
+  page,
+}, testInfo) => {
   await page.goto("/");
   await expect(page.getByText("2027届", { exact: true }).first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "车辆行业校招情报" })).toBeVisible();
@@ -51,7 +53,9 @@ test("external links have specific names and duplicate URLs are collapsed", asyn
   expect(labels.every((label) => label.length >= 8)).toBe(true);
   expect(labels.some((label) => /招聘官网|查看来源|核对来源/.test(label))).toBe(false);
 
-  const urls = await externalLinks.evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  const urls = await externalLinks.evaluateAll((links) =>
+    links.map((link) => link.getAttribute("href")),
+  );
   expect(new Set(urls).size).toBe(urls.length);
 });
 
@@ -76,10 +80,7 @@ test("platform resources have real internal reading pages", async ({ page }) => 
   const firstResource = page.getByTestId("resource-row").first();
   const readLink = firstResource.getByRole("link", { name: /阅读全文/ });
   await expect(readLink).toBeVisible();
-  await Promise.all([
-    page.waitForURL(/\/resources\/[^/]+$/),
-    readLink.click(),
-  ]);
+  await Promise.all([page.waitForURL(/\/resources\/[^/]+$/), readLink.click()]);
   await expect(page.getByRole("navigation", { name: "文章目录" })).toBeVisible();
   expect(await page.locator("article section").count()).toBeGreaterThanOrEqual(3);
 });

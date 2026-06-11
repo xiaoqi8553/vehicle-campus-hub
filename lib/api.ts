@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { stringifyStringList } from "@/lib/domain";
 
-const stringList = z.union([z.array(z.string()), z.string()]).transform((value) =>
-  Array.isArray(value)
-    ? stringifyStringList(value)
-    : stringifyStringList(value.split(",").map((item) => item.trim())),
-);
+const stringList = z
+  .union([z.array(z.string()), z.string()])
+  .transform((value) =>
+    Array.isArray(value)
+      ? stringifyStringList(value)
+      : stringifyStringList(value.split(",").map((item) => item.trim())),
+  );
 
 const optionalUrl = z
   .string()

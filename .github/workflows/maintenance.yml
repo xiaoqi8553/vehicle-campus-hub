@@ -1,0 +1,30 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    - cron: "23 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-link-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Audit production links
+        env:
+          AUDIT_BASE_URL: https://vehicle-campus-hub.vercel.app
+        run: npx tsx scripts/audit-production-links.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weekly-link-health-report
+          path: tmp/production-link-health.json
+          retention-days: 90

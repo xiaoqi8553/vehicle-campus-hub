@@ -33,7 +33,8 @@ export function CompanyLinkAction({
       rel="noreferrer"
       target="_blank"
     >
-      {link.title}<ExternalLinkIcon size={15} />
+      {link.title}
+      <ExternalLinkIcon size={15} />
     </a>
   );
 }
@@ -50,8 +51,16 @@ export function LinkEvidenceRow({
     <>
       <span className="source-kind">{linkSourceTypeLabel(link.sourceType)}</span>
       <strong>{link.title}</strong>
-      <span>{externalDomain(link.url)} · 面向 {link.targetCohort}</span>
-      <small><ShieldCheck size={13} /><span className={`link-health health-${link.healthStatus.toLowerCase()}`}>{linkHealthLabel(link.healthStatus)}</span> · 核验于 {date(link.verifiedAt)}</small>
+      <span>
+        {externalDomain(link.url)} · 面向 {link.targetCohort}
+      </span>
+      <small>
+        <ShieldCheck size={13} />
+        <span className={`link-health health-${link.healthStatus.toLowerCase()}`}>
+          {linkHealthLabel(link.healthStatus)}
+        </span>{" "}
+        · 核验于 {date(link.verifiedAt)}
+      </small>
       <p>{link.evidenceSummary}</p>
     </>
   );
@@ -64,10 +73,14 @@ export function LinkEvidenceRow({
       rel="noreferrer"
       target="_blank"
     >
-      {content}<ExternalLinkIcon className="source-row-icon" size={16} />
+      {content}
+      <ExternalLinkIcon className="source-row-icon" size={16} />
     </a>
   ) : (
-    <div className="source-row source-row-disabled" aria-label={`${companyName}：${link.title}，${linkHealthLabel(link.healthStatus)}`}>
+    <div
+      className="source-row source-row-disabled"
+      aria-label={`${companyName}：${link.title}，${linkHealthLabel(link.healthStatus)}`}
+    >
       {content}
     </div>
   );
