@@ -3,6 +3,8 @@ import {
   determineRecruitmentStatus,
   generateVehicleAdvice,
   groupCalendarEvents,
+  isCohortEvidence,
+  isUsableLinkEvidence,
   parseStringList,
   safeExternalUrl,
   stringifyStringList,
@@ -145,5 +147,43 @@ describe("safeExternalUrl", () => {
     expect(safeExternalUrl("#")).toBeNull();
     expect(safeExternalUrl("javascript:alert(1)")).toBeNull();
     expect(safeExternalUrl("")).toBeNull();
+  });
+});
+
+describe("link evidence", () => {
+  it("does not treat dead, blocked or placeholder URLs as usable evidence", () => {
+    expect(isUsableLinkEvidence({
+      url: "https://hr.xiaomi.com/campus/0",
+      healthStatus: "DEAD",
+    })).toBe(false);
+    expect(isUsableLinkEvidence({
+      url: "https://www.tesla.cn/careers",
+      healthStatus: "BLOCKED",
+    })).toBe(false);
+    expect(isUsableLinkEvidence({
+      url: "https://example.com/campus",
+      healthStatus: "OK",
+    })).toBe(false);
+    expect(isUsableLinkEvidence({
+      url: "https://hr.xiaomi.com/campus",
+      healthStatus: "OK",
+    })).toBe(true);
+  });
+
+  it("requires cohort-specific evidence before counting a 2027 opening", () => {
+    expect(isCohortEvidence({
+      sourceType: "CAREERS_SITE",
+      targetCohort: "不限",
+      evidenceSummary: "企业通用招聘官网。",
+      healthStatus: "OK",
+      url: "https://jobs.zf.com/?locale=zh_CN",
+    }, 2027)).toBe(false);
+    expect(isCohortEvidence({
+      sourceType: "CAMPUS_PORTAL",
+      targetCohort: "2027",
+      evidenceSummary: "官方页面明确列出面向 2027 届的实习项目。",
+      healthStatus: "OK",
+      url: "https://hr.xiaomi.com/campus",
+    }, 2027)).toBe(true);
   });
 });

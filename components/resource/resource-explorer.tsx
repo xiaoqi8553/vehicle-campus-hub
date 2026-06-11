@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { BookOpen, RotateCcw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ResourceData, CompanyCardData } from "@/lib/data";
 import { RESOURCE_TYPES } from "@/lib/constants";
-import { ExternalLink } from "@/components/ui/external-link";
 
 type Item = ResourceData & { company: CompanyCardData | null };
 const DIRECTIONS = ["自动驾驶", "嵌入式", "底盘", "整车研发", "三电", "电池", "热管理", "智能座舱", "测试验证"];
@@ -27,7 +27,7 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
     <>
       <div className="resource-notice">
         <BookOpen size={19} />
-        <div><strong>公共方法资料，不代表任何企业题库</strong><p>当前资料由平台整理，用于建立复习框架；没有外部来源时不会显示可点击按钮。</p></div>
+        <div><strong>平台整理，不代表任何企业题库</strong><p>每条资料都包含完整正文与检查清单；没有实际内容的简介不会作为资源发布。</p></div>
       </div>
       <div className="filter-panel resource-filters">
         <div className="direction-tabs" aria-label="车辆方向资料分组">
@@ -51,8 +51,9 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
               <div className="tag-row">{item.tags.map((tag) => <i key={tag}>{tag}</i>)}</div>
             </div>
             <div className="resource-source">
-              <strong>{item.credibility}</strong>
-              <ExternalLink href={item.sourceUrl} emptyLabel="暂无外部来源">查看来源</ExternalLink>
+              <strong>平台整理</strong>
+              <span>{item.content.length} 个章节</span>
+              <Link href={`/resources/${item.id}`} aria-label={`阅读全文：${item.title}`}>阅读全文</Link>
             </div>
           </article>
         ))}

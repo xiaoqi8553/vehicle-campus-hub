@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { ArrowRight, CheckCircle2, ShieldAlert } from "lucide-react";
+
+const FEEDBACK_URL = "https://github.com/xiaoqi8553/vehicle-campus-hub/issues/new?template=data-correction.md";
 
 const audience = [
   "车辆工程",
@@ -59,8 +60,8 @@ export default function AboutPage() {
 
       <section className="detail-section" id="feedback">
         <div className="detail-section-title"><CheckCircle2 size={20} /><h2>纠错反馈方式</h2></div>
-        <p>如果你发现某家公司 2027 届校招入口、截止时间、岗位方向或资料来源有误，可以在后续版本通过站内反馈表提交。当前阶段请在 GitHub Issue 或项目维护入口补充：公司名、正确链接、来源截图或公告链接、核验日期。</p>
-        <Link href="/companies" className="button button-primary">返回公司库<ArrowRight size={15} /></Link>
+        <p>发现届次、入口状态或证据摘要有误时，可直接打开预设 GitHub Issue。请填写公司名、原链接、建议链接、证据摘要和核验日期。</p>
+        <a aria-label="打开 GitHub 提交数据纠错反馈" href={FEEDBACK_URL} className="button button-primary" target="_blank" rel="noreferrer">提交纠错反馈<ArrowRight size={15} /></a>
       </section>
 
       <section className="detail-section">

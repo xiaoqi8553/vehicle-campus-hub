@@ -39,7 +39,31 @@ model Company {
   jobs                     Job[]
   resources                Resource[]
   calendarEvents           CalendarEvent[]
+  links                    CompanyLink[]
   favorites                Favorite[]
+}
+
+model CompanyLink {
+  id              String   @id @default(cuid())
+  companyId       String
+  title           String
+  url             String
+  finalUrl        String?
+  sourceType      String
+  targetCohort    String
+  verifiedAt      DateTime?
+  healthStatus    String
+  evidenceSummary String
+  isPrimary       Boolean  @default(false)
+  httpStatus      Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  recruitments    Recruitment[]
+
+  @@index([companyId])
+  @@index([healthStatus])
+  @@unique([companyId, url])
 }
 
 model Recruitment {
@@ -63,13 +87,16 @@ model Recruitment {
   dateConfidence String          @default("UNKNOWN")
   changeSummary  String?
   credibility    String
+  sourceLinkId   String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sourceLink     CompanyLink?    @relation(fields: [sourceLinkId], references: [id], onDelete: SetNull)
   jobs           Job[]
   calendarEvents CalendarEvent[]
 
   @@index([companyId])
+  @@index([sourceLinkId])
 }
 
 model Job {
@@ -116,6 +143,7 @@ model Resource {
   dateConfidence String    @default("UNKNOWN")
   changeSummary  String?
   summary        String
+  content        String    @default("[]")
   credibility    String
   tags           String    @default("[]")
   lastVerifiedAt DateTime?

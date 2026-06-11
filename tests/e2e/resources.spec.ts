@@ -12,7 +12,8 @@ test.describe("public preparation resources", () => {
     const titles = await resources.locator("h2").allTextContents();
     expect(new Set(titles).size).toBe(titles.length);
     expect(titles.every((title) => !title.includes("平台通用："))).toBe(true);
-    await expect(page.getByText("公共方法资料，不代表任何企业题库")).toBeVisible();
+    await expect(page.getByText("平台整理，不代表任何企业题库")).toBeVisible();
+    await expect(page.getByRole("link", { name: /阅读全文/ })).toHaveCount(6);
   });
 
   test("direction and type filters work without fake company resources", async ({ page }) => {
@@ -25,6 +26,7 @@ test.describe("public preparation resources", () => {
 
   test("invalid links never become clickable", async ({ page }) => {
     await expect(page.locator('a[href*="example.com"], a[href="#"], a[href=""]')).toHaveCount(0);
-    await expect(page.getByText("暂无外部来源").first()).toBeVisible();
+    await expect(page.locator('a[target="_blank"]')).toHaveCount(0);
+    await expect(page.getByText("平台整理", { exact: true }).first()).toBeVisible();
   });
 });

@@ -1,61 +1,81 @@
 import Link from "next/link";
-import { ArrowRight, CalendarClock, Radar } from "lucide-react";
+import { ArrowRight, CalendarClock, ShieldAlert } from "lucide-react";
+import { CompanyLinkAction } from "@/components/company/company-link";
 import { DataState } from "@/components/ui/data-state";
-import { ExternalLink } from "@/components/ui/external-link";
-import { getCalendarEvents, getCompanies } from "@/lib/data";
-import { groupCalendarEvents } from "@/lib/domain";
+import { getCompanies } from "@/lib/data";
+import { isCohortEvidence } from "@/lib/domain";
+
+function date(value: string | null | undefined) {
+  return value
+    ? new Intl.DateTimeFormat("zh-CN", { timeZone: "UTC" }).format(new Date(value))
+    : "待人工确认";
+}
 
 export default async function CalendarPage() {
   try {
-    const [events, companies] = await Promise.all([getCalendarEvents(), getCompanies()]);
-    const groups = groupCalendarEvents(events);
-    const verifiedEvents = [...groups.sevenDays, ...groups.thirtyDays, ...groups.currentMonth];
+    const companies = await getCompanies();
+    const openUndated = companies.flatMap((company) => {
+      const program = company.recruitments?.find((item) =>
+        item.targetYear === 2027
+        && item.status.includes("开放")
+        && item.sourceLink
+        && isCohortEvidence(item.sourceLink, 2027),
+      );
+      return program ? [{ company, program }] : [];
+    });
+    const unpublished = companies.filter((company) =>
+      !openUndated.some((item) => item.company.id === company.id),
+    );
 
     return (
       <div className="shell page-space">
         <div className="page-heading">
-          <p className="eyebrow">VERIFIED TIMELINE</p>
+          <p className="eyebrow">2027 RECRUITMENT TIMELINE</p>
           <h1>2027届车辆行业校招日历</h1>
-          <p>只发布同时具备可靠来源、人工核验时间和明确日期的事件。当前没有证据时，页面宁可留空。</p>
+          <p>没有经过核验的日期就不放进日历。当前页面把“项目已开放但未公布截止日期”和“尚未发布项目”分开呈现。</p>
         </div>
 
         <section className="calendar-summary">
-          <article><strong>{groups.sevenDays.length}</strong><span>7 天内截止</span></article>
-          <article><strong>{groups.thirtyDays.length}</strong><span>30 天内截止</span></article>
-          <article><strong>{groups.currentMonth.length}</strong><span>本月开启</span></article>
+          <article><strong>0</strong><span>7 天内截止</span></article>
+          <article><strong>0</strong><span>30 天内截止</span></article>
+          <article><strong>{openUndated.length}</strong><span>开放但无截止日期</span></article>
         </section>
 
         <section className="calendar-timeline">
-          <div className="section-heading compact-heading"><div><p className="eyebrow">PUBLISHED EVENTS</p><h2>已核验时间线</h2></div></div>
-          {verifiedEvents.length ? verifiedEvents.map((event) => (
-            <article className="calendar-event" data-testid="calendar-event" key={event.id}>
-              <time dateTime={event.eventDate ?? undefined}>{event.eventDate ? new Date(event.eventDate).toLocaleDateString("zh-CN") : ""}</time>
-              <div><strong>{event.company.name}</strong><span>{event.title}</span></div>
-              <ExternalLink href={event.sourceUrl} emptyLabel="来源待补">核对来源</ExternalLink>
-            </article>
-          )) : (
-            <div className="calendar-empty">
-              <CalendarClock size={30} />
-              <strong>暂无已核验招聘日程</strong>
-              <p>尚未获得可同时证明日期、事件类型和来源的 2027 届官方信息。</p>
-            </div>
-          )}
+          <div className="section-heading compact-heading">
+            <div><p className="eyebrow">OPEN / DATE UNKNOWN</p><h2>已开放但未公布截止日期</h2></div>
+            <p>可确认届次与项目存在，但不能推测开始或截止日期。</p>
+          </div>
+          <div className="undated-list">
+            {openUndated.map(({ company, program }) => (
+              <article className="undated-row" data-testid="open-undated-row" key={program.id}>
+                <CalendarClock size={20} />
+                <div><strong>{company.name}</strong><span>{program.title}</span></div>
+                <p>截止日期未公布<small>核验于 {date(program.verifiedAt)}</small></p>
+                <CompanyLinkAction companyName={company.name} link={program.sourceLink} />
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="watchlist-section">
           <div className="section-heading compact-heading">
-            <div><p className="eyebrow">WATCHLIST</p><h2>持续跟踪企业</h2></div>
-            <p>招聘官网可用于观察，不等于批次已经开放。</p>
+            <div><p className="eyebrow">NOT PUBLISHED</p><h2>尚未发布 2027 项目</h2></div>
+            <p>这些企业已进入观察名单，但通用招聘站不能证明 2027 届项目开放。</p>
           </div>
-          <div className="watchlist">
-            {companies.map((company) => (
-              <article className="watchlist-row" data-testid="watchlist-row" key={company.id}>
-                <Radar size={16} />
-                <strong>{company.name}</strong>
-                <span>{company.recruitments?.length ? "已有 2027 实习证据" : "日期待官方发布"}</span>
-                <ExternalLink href={company.recruitmentWebsite} emptyLabel="入口待复核">招聘官网</ExternalLink>
-                <Link href={`/companies/${company.slug}`} aria-label={`查看 ${company.name} 档案`}><ArrowRight size={15} /></Link>
-              </article>
+          <div className="watchlist-table" role="table" aria-label="尚未发布 2027 项目的企业">
+            <div className="watchlist-head" role="row">
+              <span role="columnheader">企业</span><span role="columnheader">公司类型</span><span role="columnheader">当前判断</span><span role="columnheader">档案</span>
+            </div>
+            {unpublished.map((company) => (
+              <div className="watchlist-row" data-testid="watchlist-row" role="row" key={company.id}>
+                <strong role="cell">{company.name}</strong>
+                <span role="cell">{company.type}</span>
+                <span role="cell"><ShieldAlert size={14} />未发现明确 2027 项目证据</span>
+                <Link role="cell" href={`/companies/${company.slug}`} aria-label={`查看${company.name}证据档案`}>
+                  查看档案<ArrowRight size={15} />
+                </Link>
+              </div>
             ))}
           </div>
         </section>

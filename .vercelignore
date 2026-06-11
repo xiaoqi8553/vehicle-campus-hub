@@ -1,4 +1,7 @@
 docs/screenshots/
+docs/audit/
+docs/benchmarks/
+docs/redesign/
 test-results/
 playwright-report/
 playwright-report-production/

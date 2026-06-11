@@ -1,11 +1,17 @@
 import type {
   CalendarEvent,
   Company,
+  CompanyLink,
   Job,
   Recruitment,
   Resource,
 } from "@prisma/client";
-import { normalizeSourceType, parseStringList, safeExternalUrl } from "@/lib/domain";
+import {
+  isCohortEvidence,
+  normalizeSourceType,
+  parseStringList,
+  safeExternalUrl,
+} from "@/lib/domain";
 import { prisma } from "@/lib/prisma";
 
 export type CompanyBaseData = ReturnType<typeof serializeCompany>;
@@ -13,7 +19,22 @@ export type RecruitmentData = ReturnType<typeof serializeRecruitment>;
 export type JobData = ReturnType<typeof serializeJob>;
 export type ResourceData = ReturnType<typeof serializeResource>;
 export type CalendarEventData = ReturnType<typeof serializeCalendarEvent>;
-export type CompanyCardData = CompanyBaseData & { recruitments?: RecruitmentData[] };
+export type CompanyLinkData = ReturnType<typeof serializeCompanyLink>;
+export type CompanyCardData = CompanyBaseData & {
+  recruitments?: Array<RecruitmentData & { sourceLink?: CompanyLinkData | null }>;
+  links?: CompanyLinkData[];
+};
+
+export function serializeCompanyLink(link: CompanyLink) {
+  return {
+    ...link,
+    url: safeExternalUrl(link.url),
+    finalUrl: safeExternalUrl(link.finalUrl),
+    verifiedAt: link.verifiedAt?.toISOString() ?? null,
+    createdAt: link.createdAt.toISOString(),
+    updatedAt: link.updatedAt.toISOString(),
+  };
+}
 
 export function serializeCompany(company: Company) {
   const vehicleDirections = parseStringList(company.vehicleDirections).length
@@ -99,6 +120,14 @@ export function serializeResource(resource: Resource) {
     tags: parseStringList(resource.tags),
     targetYear: resource.targetYear ?? 2027,
     sourceYear: resource.sourceYear ?? 2026,
+    content: (() => {
+      try {
+        const parsed: unknown = JSON.parse(resource.content);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })() as Array<{ heading: string; paragraphs: string[]; checklist: string[] }>,
     lastVerifiedAt: resource.lastVerifiedAt?.toISOString() ?? null,
     verifiedAt: resource.verifiedAt?.toISOString() ?? null,
     createdAt: resource.createdAt.toISOString(),
@@ -127,20 +156,42 @@ export function serializeCalendarEvent(event: CalendarEvent) {
 
 export async function getCompanies() {
   const companies = await prisma.company.findMany({
-    include: { recruitments: { orderBy: { updatedAt: "desc" } } },
-    orderBy: [{ lastUpdatedAt: "desc" }, { name: "asc" }],
+    include: {
+      links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
+      recruitments: {
+        include: { sourceLink: true },
+        orderBy: { updatedAt: "desc" },
+      },
+    },
+    orderBy: { name: "asc" },
   });
   return companies.map((company) => ({
     ...serializeCompany(company),
-    recruitments: company.recruitments.map(serializeRecruitment),
-  }));
+    links: company.links.map(serializeCompanyLink),
+    recruitments: company.recruitments.map((recruitment) => ({
+      ...serializeRecruitment(recruitment),
+      sourceLink: recruitment.sourceLink ? serializeCompanyLink(recruitment.sourceLink) : null,
+    })),
+  })).sort((a, b) => {
+    const aOpen = a.links.some((link) => isCohortEvidence(link, 2027))
+      && a.recruitments.some((item) => item.targetYear === 2027 && item.status.includes("开放"));
+    const bOpen = b.links.some((link) => isCohortEvidence(link, 2027))
+      && b.recruitments.some((item) => item.targetYear === 2027 && item.status.includes("开放"));
+    if (aOpen !== bOpen) return Number(bOpen) - Number(aOpen);
+    const latest = (links: CompanyLinkData[]) => Math.max(
+      0,
+      ...links.map((link) => link.verifiedAt ? Date.parse(link.verifiedAt) : 0),
+    );
+    return latest(b.links) - latest(a.links) || a.name.localeCompare(b.name, "zh-CN");
+  });
 }
 
 export async function getCompanyDetail(id: string) {
   const company = await prisma.company.findUnique({
     where: { id },
     include: {
-      recruitments: { orderBy: { startDate: "desc" } },
+      links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
+      recruitments: { include: { sourceLink: true }, orderBy: { startDate: "desc" } },
       jobs: { orderBy: { vehicleFitScore: "desc" } },
       resources: { orderBy: { createdAt: "desc" } },
       calendarEvents: { orderBy: { eventDate: "asc" } },
@@ -148,7 +199,8 @@ export async function getCompanyDetail(id: string) {
   }) ?? await prisma.company.findUnique({
     where: { slug: id },
     include: {
-      recruitments: { orderBy: { startDate: "desc" } },
+      links: { orderBy: [{ isPrimary: "desc" }, { sourceType: "asc" }] },
+      recruitments: { include: { sourceLink: true }, orderBy: { startDate: "desc" } },
       jobs: { orderBy: { vehicleFitScore: "desc" } },
       resources: { orderBy: { createdAt: "desc" } },
       calendarEvents: { orderBy: { eventDate: "asc" } },
@@ -157,7 +209,11 @@ export async function getCompanyDetail(id: string) {
   if (!company) return null;
   return {
     ...serializeCompany(company),
-    recruitments: company.recruitments.map(serializeRecruitment),
+    links: company.links.map(serializeCompanyLink),
+    recruitments: company.recruitments.map((recruitment) => ({
+      ...serializeRecruitment(recruitment),
+      sourceLink: recruitment.sourceLink ? serializeCompanyLink(recruitment.sourceLink) : null,
+    })),
     jobs: company.jobs.map(serializeJob),
     resources: company.resources.map(serializeResource),
     calendarEvents: company.calendarEvents.map(serializeCalendarEvent),
@@ -173,6 +229,18 @@ export async function getResources() {
     ...serializeResource(resource),
     company: resource.company ? serializeCompany(resource.company) : null,
   }));
+}
+
+export async function getResource(id: string) {
+  const resource = await prisma.resource.findUnique({
+    where: { id },
+    include: { company: true },
+  });
+  if (!resource) return null;
+  return {
+    ...serializeResource(resource),
+    company: resource.company ? serializeCompany(resource.company) : null,
+  };
 }
 
 export async function getCalendarEvents() {

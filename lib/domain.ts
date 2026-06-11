@@ -172,6 +172,79 @@ export function safeExternalUrl(url: string | null | undefined): string | null {
   }
 }
 
+export type LinkSourceType =
+  | "COHORT_PROJECT"
+  | "CAMPUS_PORTAL"
+  | "CAREERS_SITE"
+  | "OFFICIAL_ANNOUNCEMENT"
+  | "TALENT_PAGE"
+  | "COMPANY_WEBSITE"
+  | "TRUSTED_THIRD_PARTY";
+
+export type LinkHealthStatus =
+  | "OK"
+  | "BROWSER_ONLY"
+  | "BLOCKED"
+  | "REDIRECTED"
+  | "DEAD"
+  | "MANUAL_REVIEW";
+
+export type LinkEvidenceInput = {
+  url: string | null | undefined;
+  healthStatus: string | null | undefined;
+};
+
+export function isUsableLinkEvidence(link: LinkEvidenceInput): boolean {
+  return Boolean(
+    safeExternalUrl(link.url)
+    && ["OK", "BROWSER_ONLY", "REDIRECTED"].includes(link.healthStatus ?? ""),
+  );
+}
+
+export function isCohortEvidence(
+  link: LinkEvidenceInput & {
+    sourceType: string | null | undefined;
+    targetCohort: string | null | undefined;
+    evidenceSummary: string | null | undefined;
+  },
+  cohort: number,
+): boolean {
+  if (!isUsableLinkEvidence(link)) return false;
+  if (!["COHORT_PROJECT", "CAMPUS_PORTAL", "OFFICIAL_ANNOUNCEMENT"].includes(link.sourceType ?? "")) {
+    return false;
+  }
+  const cohortText = `${link.targetCohort ?? ""} ${link.evidenceSummary ?? ""}`;
+  return cohortText.includes(String(cohort));
+}
+
+export function linkSourceTypeLabel(value: string | null | undefined): string {
+  return {
+    COHORT_PROJECT: "2027 届具体项目",
+    CAMPUS_PORTAL: "校园招聘门户",
+    CAREERS_SITE: "通用招聘官网",
+    OFFICIAL_ANNOUNCEMENT: "官方招聘公告",
+    TALENT_PAGE: "企业人才介绍页",
+    COMPANY_WEBSITE: "企业官网",
+    TRUSTED_THIRD_PARTY: "第三方可信来源",
+  }[value ?? ""] ?? "来源类型待确认";
+}
+
+export function linkHealthLabel(value: string | null | undefined): string {
+  return {
+    OK: "可正常访问",
+    BROWSER_ONLY: "仅浏览器可访问",
+    BLOCKED: "被反爬拦截",
+    REDIRECTED: "已重定向",
+    DEAD: "已失效",
+    MANUAL_REVIEW: "待人工确认",
+  }[value ?? ""] ?? "待人工确认";
+}
+
+export function externalDomain(url: string | null | undefined): string {
+  const safeUrl = safeExternalUrl(url);
+  return safeUrl ? new URL(safeUrl).hostname.replace(/^www\./, "") : "无有效域名";
+}
+
 export type EvidenceSourceType =
   | "OFFICIAL"
   | "SCHOOL"
