@@ -36,7 +36,11 @@ for (const file of trackedFiles) {
   if (!textExtensions.has(extname(file)) && !file.endsWith(".env.example")) continue;
 
   try {
-    const contents = decoder.decode(readFileSync(file));
+    const bytes = readFileSync(file);
+    const contents = decoder.decode(bytes);
+    if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) {
+      failures.push(`${file}: contains a UTF-8 BOM`);
+    }
     if (contents.includes("\uFFFD"))
       failures.push(`${file}: contains Unicode replacement characters`);
   } catch (error) {
