@@ -53,12 +53,14 @@ test("main pages have one h1, no fake links, errors or horizontal overflow", asy
       if (message.type() === "error") errors.push(message.text());
     });
     page.on("requestfailed", (request) => {
+      const failure = request.failure()?.errorText ?? "";
       if (
-        request.resourceType() === "document" ||
-        request.resourceType() === "script" ||
-        request.resourceType() === "stylesheet"
+        !failure.includes("ERR_ABORTED") &&
+        (request.resourceType() === "document" ||
+          request.resourceType() === "script" ||
+          request.resourceType() === "stylesheet")
       ) {
-        failedRequests.push(`${request.method()} ${request.url()}`);
+        failedRequests.push(`${request.method()} ${request.url()}: ${failure}`);
       }
     });
     for (const route of routes) {

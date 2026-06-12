@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { BookOpen, RotateCcw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ResourceData, CompanyCardData } from "@/lib/data";
@@ -120,9 +119,9 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
             <div className="resource-source">
               <strong>平台整理</strong>
               <span>{item.content.length} 个章节</span>
-              <Link href={`/resources/${item.id}`} aria-label={`阅读全文：${item.title}`}>
+              <a href={`/resources/${item.id}`} aria-label={`阅读全文：${item.title}`}>
                 阅读全文
-              </Link>
+              </a>
             </div>
           </article>
         ))}
