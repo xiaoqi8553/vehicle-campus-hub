@@ -3,6 +3,7 @@ import {
   determineRecruitmentStatus,
   generateVehicleAdvice,
   groupCalendarEvents,
+  isPlaceholderExternalUrl,
   isCohortEvidence,
   isUsableLinkEvidence,
   parseStringList,
@@ -131,9 +132,22 @@ describe("safeExternalUrl", () => {
     );
     expect(safeExternalUrl("https://example.com/demo")).toBeNull();
     expect(safeExternalUrl("https://www.example.com/demo")).toBeNull();
+    expect(safeExternalUrl("https://example.com.evil.test/campus")).toBe(
+      "https://example.com.evil.test/campus",
+    );
+    expect(safeExternalUrl("https://careers.example.org/example.com")).toBe(
+      "https://careers.example.org/example.com",
+    );
     expect(safeExternalUrl("#")).toBeNull();
     expect(safeExternalUrl("javascript:alert(1)")).toBeNull();
     expect(safeExternalUrl("")).toBeNull();
+  });
+
+  it("detects placeholder hosts without matching arbitrary URL substrings", () => {
+    expect(isPlaceholderExternalUrl("https://example.com/demo")).toBe(true);
+    expect(isPlaceholderExternalUrl("https://jobs.example.com/campus")).toBe(true);
+    expect(isPlaceholderExternalUrl("https://example.com.evil.test/campus")).toBe(false);
+    expect(isPlaceholderExternalUrl("https://careers.example.org/example.com")).toBe(false);
   });
 });
 

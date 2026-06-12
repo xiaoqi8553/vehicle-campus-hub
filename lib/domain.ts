@@ -144,14 +144,23 @@ export function generateVehicleAdvice(tags: string[], directions: string[]): str
   return [...new Set(advice.length ? advice : ["车辆工程基础", "项目复盘", "岗位定向简历"])];
 }
 
+export function isPlaceholderExternalUrl(url: string | null | undefined): boolean {
+  if (!url?.trim()) return false;
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname === "example.com" || hostname.endsWith(".example.com");
+  } catch {
+    return false;
+  }
+}
+
 export function safeExternalUrl(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try {
     const parsed = new URL(url);
     const hostname = parsed.hostname.toLowerCase();
     const isPlaceholder =
-      hostname === "example.com" ||
-      hostname.endsWith(".example.com") ||
+      isPlaceholderExternalUrl(url) ||
       hostname === "localhost" ||
       hostname === "0.0.0.0" ||
       hostname === "127.0.0.1";

@@ -431,11 +431,12 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 2. 公司详情完整 RSC 树在 Next 15 客户端切换时出现稳定挂起；直接访问正常、响应为 200 且无控制台错误。公司详情入口改为标准同站文档导航，真实点击连续 3 次通过。
 3. 移动端 44px 热区测试先等待首页列表稳定为 3 条，避免在响应式 `useEffect` 切换期间测量即将卸载的节点。
 4. Playwright 控件扫描限定在应用的 header、main、footer，避免把框架开发工具注入节点误判为产品控件。
+5. CodeQL 发现资源刷新脚本使用 URL 子串统计占位域名；现已改为解析 hostname，并覆盖路径文本和伪装域名绕过测试。
 
 ### 最终本地结果
 
 - `npm run test:e2e`：通过，50 passed、2 skipped、0 failed。
-- `npm run test:unit`：通过，13 passed、0 failed。
+- `npm run test:unit`：通过，14 passed、0 failed。
 - `npm run lint`：通过，0 errors。
 - `npm run typecheck`：通过。
 - `npm run build`：通过，15 个静态/动态页面与 API 路由完成生产构建。
