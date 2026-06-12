@@ -394,3 +394,55 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 2. 企业招聘 URL 可能改版或下线，建议增加定时 HEAD/GET 检查和人工复核队列。
 3. “热门资料”需要接入真实点击、收藏或使用数据后再上线。
 4. seed 仍是产品演示数据，不代表 2026 年 6 月 9 日的实时招聘批次。
+
+---
+
+## 2026-06-12 工程规范化与 PostgreSQL 迁移验收
+
+### 原有问题
+
+1. 仓库没有 CI、正式发布流程、部署标签和受保护的 `main` 工作流。
+2. Prisma 使用被 Git 跟踪的 SQLite 运行数据库，无法支持可靠的 Vercel 生产持久化与恢复。
+3. GitHub、Vercel、数据库和生产部署之间缺少可核对的 commit 记录。
+4. 生产构建下，公司列表点击详情会发出成功的 RSC 请求，但 Next.js 客户端路由不提交 URL，用户停留在列表页。
+
+### 数据库与工程变更
+
+- Prisma datasource 已从 SQLite 改为 PostgreSQL。
+- SQLite migrations 已归档，新增 PostgreSQL baseline migration。
+- Neon Marketplace 资源：`vehicle-campus-hub-db`，project id `bitter-rain-33120568`。
+- Vercel Production、Preview、Development 已连接 Neon；迁移连接优先使用 `DIRECT_URL` 或 `DATABASE_URL_UNPOOLED`。
+- SQLite 数据已通过事务导入 Neon，并执行数量与关联校验。
+- 生产数据基线：Company 25、CompanyLink 51、Recruitment 3、Resource 6。
+- 22 家企业有可用招聘或企业入口；只有 3 家具备明确的 2027 届项目证据，剩余 22 家仍需人工补充官方证据。
+
+### CI/CD 与回退能力
+
+- GitHub Actions 门禁覆盖 Prisma generate、PostgreSQL migration、seed、数据库校验、UTF-8、format、lint、typecheck、unit、build 和完整 Playwright。
+- PR 由 GitHub Actions 创建 Vercel Preview。
+- `main` CI 成功后由 GitHub Actions 构建并部署 Vercel Production。
+- 生产 smoke 校验 `/api/health.commit`，通过后创建 `deploy-日期-短SHA` 标签。
+- Release Please 维护版本 PR、CHANGELOG、tag 和 GitHub Release。
+- 新增 `CONTRIBUTING.md`、`RELEASE.md`、`ROLLBACK.md`、`SECURITY.md`、ADR、PR 和 Issue 模板。
+
+### 本轮修复
+
+1. Playwright 改为测试 `next build && next start` 的生产构建，不再以开发服务器结果代替生产行为。
+2. 公司详情完整 RSC 树在 Next 15 客户端切换时出现稳定挂起；直接访问正常、响应为 200 且无控制台错误。公司详情入口改为标准同站文档导航，真实点击连续 3 次通过。
+3. 移动端 44px 热区测试先等待首页列表稳定为 3 条，避免在响应式 `useEffect` 切换期间测量即将卸载的节点。
+4. Playwright 控件扫描限定在应用的 header、main、footer，避免把框架开发工具注入节点误判为产品控件。
+
+### 最终本地结果
+
+- `npm run test:e2e`：通过，50 passed、2 skipped、0 failed。
+- `npm run test:unit`：通过，13 passed、0 failed。
+- `npm run lint`：通过，0 errors。
+- `npm run typecheck`：通过。
+- `npm run build`：通过，15 个静态/动态页面与 API 路由完成生产构建。
+- PostgreSQL migration、SQLite import、seed 和数据库校验：通过。
+
+### 仍需人工确认
+
+1. 22 家企业缺少可证明 2027 届项目开放的官方证据，不能根据通用招聘门户推断为已开放。
+2. Neon 数据恢复演练应在非生产 branch 执行，避免为验证流程扰动生产数据。
+3. GitHub Secret Scanning 与 Push Protection 是否可启用取决于仓库套餐和账户设置。

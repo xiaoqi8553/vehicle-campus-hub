@@ -4,10 +4,10 @@
 
 1. 从最新 `main` 创建功能分支。
 2. 推送分支并创建 PR。
-3. 等待 CI、CodeQL 和 Vercel Preview。
+3. 等待 CI、CodeQL 和 `Vercel Preview` GitHub Actions。
 4. 数据库变更在 PR 描述中注明兼容窗口和恢复点要求。
 5. Squash Merge 到 `main`。
-6. Vercel Git Integration 部署生产。
+6. `Production Smoke` GitHub Actions 使用 Vercel CLI 部署生产。
 7. `Production Smoke` 等待 `/api/health.commit` 等于合并 commit。
 8. smoke test 通过后创建 `deploy-YYYYMMDD-HHmm-SHA` 标签。
 
@@ -58,9 +58,10 @@ Release Please 根据 Conventional Commits 创建 Release PR：
 
 ## Vercel 设置
 
-- Git 仓库连接 `xiaoqi8553/vehicle-campus-hub`
-- Production Branch：`main`
-- Preview：所有 PR
+- GitHub Actions Secrets：`VERCEL_TOKEN`、`VERCEL_ORG_ID`、`VERCEL_PROJECT_ID`
+- Vercel CLI：工作流固定使用 `54.12.2`
+- Preview：PR 触发 `.github/workflows/preview-deploy.yml`
+- Production：`main` CI 通过后触发 `.github/workflows/production-smoke.yml`
 - Node.js：24.x
 - Build Command：`npm run prisma:migrate:deploy && npm run build`
-- Production 与 Preview 使用不同 Neon branch
+- 当前 Neon 免费资源由 Vercel Marketplace 管理；迁移使用非池化连接

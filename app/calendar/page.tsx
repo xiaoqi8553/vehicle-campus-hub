@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight, CalendarClock, ShieldAlert } from "lucide-react";
 import { CompanyLinkAction } from "@/components/company/company-link";
 import { DataState } from "@/components/ui/data-state";
@@ -106,14 +105,14 @@ export default async function CalendarPage() {
                   <ShieldAlert size={14} />
                   未发现明确 2027 项目证据
                 </span>
-                <Link
+                <a
                   role="cell"
                   href={`/companies/${company.slug}`}
                   aria-label={`查看${company.name}证据档案`}
                 >
                   查看档案
                   <ArrowRight size={15} />
-                </Link>
+                </a>
               </div>
             ))}
           </div>

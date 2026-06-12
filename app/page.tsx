@@ -96,7 +96,7 @@ export default async function HomePage() {
                   <div>
                     <span>{company.type}</span>
                     <h3>
-                      <Link href={`/companies/${company.slug}`}>{company.name}</Link>
+                      <a href={`/companies/${company.slug}`}>{company.name}</a>
                     </h3>
                   </div>
                   <p>
@@ -120,7 +120,7 @@ export default async function HomePage() {
             </div>
             <div className="update-list">
               {updates.map((company) => (
-                <Link
+                <a
                   href={`/companies/${company.slug}`}
                   className="update-row"
                   data-testid="latest-update"
@@ -129,7 +129,7 @@ export default async function HomePage() {
                   <span>{company.shortName}</span>
                   <strong>{company.changeSummary}</strong>
                   <small>{date(company.lastUpdatedAt)}</small>
-                </Link>
+                </a>
               ))}
             </div>
           </div>

@@ -23,6 +23,8 @@ jobs:
     env:
       PRODUCTION_URL: https://vehicle-campus-hub.vercel.app
       EXPECTED_COMMIT: ${{ inputs.expected_commit || github.event.workflow_run.head_sha || github.sha }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +37,20 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+
+      - name: Pull Vercel Production configuration
+        run: npx --yes vercel@54.12.2 pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Build Production
+        run: npx --yes vercel@54.12.2 build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy Production
+        id: deploy
+        shell: bash
+        run: |
+          url="$(npx --yes vercel@54.12.2 deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}")"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployment URL: $url"
 
       - name: Wait for Vercel to expose the expected commit
         shell: bash
@@ -68,5 +84,6 @@ jobs:
           git push origin "$tag"
           echo "### Production deployment" >> "$GITHUB_STEP_SUMMARY"
           echo "- URL: $PRODUCTION_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Commit: \`$EXPECTED_COMMIT\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Tag: \`$tag\`" >> "$GITHUB_STEP_SUMMARY"

@@ -84,8 +84,9 @@ test("mobile primary controls provide a 44px interaction target", async ({ brows
   const context = await browser.newContext({ viewport: { width: 375, height: 667 } });
   const page = await context.newPage();
   await page.goto("/");
+  await expect(page.getByTestId("company-row")).toHaveCount(3);
   const controls = page.locator(
-    "a.button:visible, button:visible, input:visible, select:visible, summary:visible",
+    "header a.button:visible, header button:visible, main a.button:visible, main button:visible, main input:visible, main select:visible, main summary:visible, footer a.button:visible, footer button:visible",
   );
   const boxes = await controls.evaluateAll((elements) =>
     elements.map((element) => {

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight, ChevronDown, MapPin } from "lucide-react";
 import { CompanyLinkAction, LinkEvidenceRow } from "@/components/company/company-link";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -33,7 +32,7 @@ export function CompanyCard({ company }: { company: CompanyCardData }) {
         <div>
           <p>{company.type}</p>
           <h2>
-            <Link href={`/companies/${company.slug}`}>{company.name}</Link>
+            <a href={`/companies/${company.slug}`}>{company.name}</a>
           </h2>
           <span className="company-city">
             <MapPin size={14} />
@@ -61,14 +60,14 @@ export function CompanyCard({ company }: { company: CompanyCardData }) {
 
       <div className="company-row-actions">
         <CompanyLinkAction companyName={company.name} link={primaryLink} />
-        <Link
+        <a
           href={`/companies/${company.slug}`}
           className="row-link"
           aria-label={`查看${company.name}证据档案`}
         >
           查看证据档案
           <ArrowRight size={15} />
-        </Link>
+        </a>
       </div>
 
       {otherLinks.length > 0 && (
