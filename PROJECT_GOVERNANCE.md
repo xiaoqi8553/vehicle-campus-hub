@@ -20,8 +20,8 @@
 | Neon Marketplace 安装              | 已完成     | Vercel Neon 资源 `vehicle-campus-hub-db`       |
 | Vercel Neon 环境变量               | 已完成     | pooled runtime 与 unpooled migration 连接      |
 | Vercel Actions 部署                | 已完成     | GitHub Actions 管理 Preview 与 Production      |
-| GitHub `main` Ruleset              | 发布收尾中 | PR 检查通过后由仓库 API 配置                   |
-| Secret Scanning / Push Protection  | 需人工确认 | 取决于 GitHub 仓库套餐和安全设置可用性         |
+| GitHub `main` Ruleset              | 已完成     | 强制 PR、状态检查、线性历史，禁止强推和删除    |
+| Secret Scanning / Push Protection  | 已完成     | Secret Scanning、Push Protection 已启用        |
 | 生产数据迁移                       | 已完成     | 25 家企业、51 条链接及关联数据校验一致         |
 | 完整数据库回退演练                 | 延期       | 需在非生产 Neon branch 执行恢复演练            |
 

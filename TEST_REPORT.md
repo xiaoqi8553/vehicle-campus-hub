@@ -424,6 +424,8 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 - 生产 smoke 校验 `/api/health.commit`，通过后创建 `deploy-日期-短SHA` 标签。
 - Release Please 维护版本 PR、CHANGELOG、tag 和 GitHub Release。
 - 新增 `CONTRIBUTING.md`、`RELEASE.md`、`ROLLBACK.md`、`SECURITY.md`、ADR、PR 和 Issue 模板。
+- `main` 已要求 PR、`quality`、`pull-request-title`、`analyze`、`deploy-preview`、`CodeQL`，并禁止 force push 和分支删除。
+- Secret Scanning、Push Protection 与 Dependabot security updates 已启用。
 
 ### 本轮修复
 
@@ -448,4 +450,3 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 
 1. 22 家企业缺少可证明 2027 届项目开放的官方证据，不能根据通用招聘门户推断为已开放。
 2. Neon 数据恢复演练应在非生产 branch 执行，避免为验证流程扰动生产数据。
-3. GitHub Secret Scanning 与 Push Protection 是否可启用取决于仓库套餐和账户设置。
