@@ -433,6 +433,7 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 4. Playwright 控件扫描限定在应用的 header、main、footer，避免把框架开发工具注入节点误判为产品控件。
 5. CodeQL 发现资源刷新脚本使用 URL 子串统计占位域名；现已改为解析 hostname，并覆盖路径文本和伪装域名绕过测试。
 6. CI 复测发现资源详情存在同类客户端动态路由挂起，现统一改为标准同站文档导航；多路由巡检只忽略浏览器主动取消的 `ERR_ABORTED` 预取请求。
+7. Preview 曾与其他部署同时执行生产迁移并争抢 PostgreSQL advisory lock；Vercel 默认构建现仅执行 build，只有 Production workflow 显式加载生产环境并运行 `migrate deploy`。
 
 ### 最终本地结果
 

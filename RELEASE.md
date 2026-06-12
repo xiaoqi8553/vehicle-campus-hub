@@ -63,5 +63,6 @@ Release Please 根据 Conventional Commits 创建 Release PR：
 - Preview：PR 触发 `.github/workflows/preview-deploy.yml`
 - Production：`main` CI 通过后触发 `.github/workflows/production-smoke.yml`
 - Node.js：24.x
-- Build Command：`npm run prisma:migrate:deploy && npm run build`
+- Preview Build Command：`npm run build`，禁止迁移生产数据库
+- Production migration：Actions 加载 `.vercel/.env.production.local` 后执行 `prisma migrate deploy`
 - 当前 Neon 免费资源由 Vercel Marketplace 管理；迁移使用非池化连接
