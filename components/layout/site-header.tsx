@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { Crosshair, Menu } from "lucide-react";
+import { Menu, MessageSquareText } from "lucide-react";
+import { BrandMark } from "@/components/brand/brand-mark";
 
 const navItems = [
-  { href: "/companies", label: "公司库" },
-  { href: "/calendar", label: "校招日历" },
-  { href: "/resources", label: "笔试面经" },
-  { href: "/about", label: "关于项目" },
+  { href: "/", label: "首页" },
+  { href: "/companies", label: "公司机会" },
+  { href: "/calendar", label: "招聘日历" },
+  { href: "/resources", label: "求职指南" },
+  { href: "/about", label: "关于我们" },
 ];
 
 export function SiteHeader() {
@@ -17,12 +19,10 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="shell header-inner">
-        <Link href="/" className="brand" aria-label="Vehicle Campus Hub 首页">
-          <span className="brand-mark">
-            <Crosshair size={19} />
-          </span>
+        <Link href="/" className="site-brand" aria-label="车招雷达首页">
+          <BrandMark />
           <span>
-            <strong>VCH</strong>
+            <strong>车招雷达</strong>
             <small>Vehicle Campus Hub</small>
           </span>
         </Link>
@@ -32,18 +32,23 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <Link className="nav-feedback" href="/about#feedback">
+            <MessageSquareText size={16} />
+            反馈信息
+          </Link>
         </nav>
         <details className="mobile-nav">
           <summary aria-label="打开导航">
             <Menu size={22} />
           </summary>
-          <div className="mobile-nav-panel">
+          <nav className="mobile-nav-panel" aria-label="移动导航">
             {items.map((item) => (
               <Link key={item.href} href={item.href}>
                 {item.label}
               </Link>
             ))}
-          </div>
+            <Link href="/about#feedback">反馈信息</Link>
+          </nav>
         </details>
       </div>
     </header>

@@ -6,22 +6,31 @@ import {
   BriefcaseBusiness,
   Building2,
   CalendarDays,
+  CheckCircle2,
   CircleHelp,
   ExternalLinkIcon,
   MapPin,
   ShieldCheck,
 } from "lucide-react";
 import { CompanyLinkAction, LinkEvidenceRow } from "@/components/company/company-link";
+import { FeedbackCallout } from "@/components/ui/feedback-callout";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getCompanyDetail } from "@/lib/data";
-import { isCohortEvidence, isUsableLinkEvidence } from "@/lib/domain";
+import {
+  isCohortEvidence,
+  isUsableLinkEvidence,
+  linkHealthLabel,
+  linkSourceTypeLabel,
+} from "@/lib/domain";
 
-const FEEDBACK_URL =
-  "https://github.com/xiaoqi8553/vehicle-campus-hub/issues/new?template=data-correction.md";
-
-function date(value: string | null | undefined) {
+function formatDate(value: string | null | undefined) {
   return value
-    ? new Intl.DateTimeFormat("zh-CN", { timeZone: "UTC" }).format(new Date(value))
+    ? new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(value))
     : "待人工确认";
 }
 
@@ -37,111 +46,146 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
     (item) =>
       item.targetYear === 2027 && item.sourceLink && isCohortEvidence(item.sourceLink, 2027),
   );
+  const currentStatus = program ? "2027 项目已开放" : primaryLink ? "等待 2027 项目" : "信息待确认";
 
   return (
-    <div className="shell page-space detail-page">
+    <div className="shell page-space company-detail-page">
       <Link className="back-link" href="/companies">
         <ArrowLeft size={16} />
-        返回公司情报库
+        返回公司机会
       </Link>
-      <header className="company-dossier">
-        <div className="dossier-mark">{company.shortName.slice(0, 1)}</div>
-        <div>
-          <p className="eyebrow">{company.type} / EVIDENCE DOSSIER</p>
-          <h1>{company.name}</h1>
-          <p>{company.description}</p>
-          <div className="dossier-badges">
-            <StatusBadge status={program?.status ?? "2027 待官方发布"} />
-            <span>{company.dataStatus}</span>
-            <span>最后核验 {date(primaryLink?.verifiedAt ?? company.verifiedAt)}</span>
+
+      <header className="company-detail-hero">
+        <div className="company-detail-brand">
+          <span className="company-avatar company-avatar-large">
+            {company.shortName.slice(0, 1)}
+          </span>
+          <div>
+            <p className="page-kicker">{company.type}</p>
+            <h1>{company.name}</h1>
+            <p>{company.description}</p>
           </div>
         </div>
-        <div className="dossier-actions">
-          <CompanyLinkAction companyName={company.name} link={primaryLink} />
+        <div className="company-detail-meta">
+          <StatusBadge status={currentStatus} />
+          <span>
+            <MapPin size={15} />
+            {company.cities.join(" / ")}
+          </span>
+          <span>
+            <ShieldCheck size={15} />
+            最后核验 {formatDate(primaryLink?.verifiedAt ?? company.verifiedAt)}
+          </span>
         </div>
+        <CompanyLinkAction companyName={company.name} link={primaryLink} />
       </header>
 
-      <div className="detail-layout">
-        <main className="detail-main">
-          <section className="detail-section">
-            <div className="detail-section-title">
-              <Building2 size={20} />
-              <h2>公司与核验概况</h2>
-            </div>
-            <div className="info-grid">
-              <div>
-                <MapPin size={17} />
-                <span>主要城市</span>
-                <strong>{company.cities.join(" / ")}</strong>
-              </div>
-              <div>
-                <BriefcaseBusiness size={17} />
-                <span>企业类型</span>
-                <strong>{company.type}</strong>
-              </div>
-              <div>
-                <ShieldCheck size={17} />
-                <span>入口状态</span>
-                <strong>{company.dataStatus}</strong>
-              </div>
-              <div>
-                <CalendarDays size={17} />
-                <span>内容更新</span>
-                <strong>{date(company.lastUpdatedAt)}</strong>
-              </div>
-            </div>
-          </section>
-
-          <section className="detail-section">
-            <div className="detail-section-title">
+      <div className="company-detail-layout">
+        <main className="company-detail-main">
+          <section className="content-section">
+            <div className="content-section-heading">
               <CalendarDays size={20} />
-              <h2>2027 届项目判断</h2>
+              <div>
+                <p className="page-kicker">2027 届</p>
+                <h2>当前校招机会</h2>
+              </div>
             </div>
             {program ? (
-              <article className="official-program">
-                <div>
-                  <p className="eyebrow">
-                    {program.targetYear}届 / {program.batch}
-                  </p>
-                  <h3>{program.title}</h3>
-                  <p>{program.notes}</p>
+              <article className="program-card">
+                <div className="program-card-top">
+                  <div>
+                    <span>{program.batch}</span>
+                    <h3>{program.title}</h3>
+                  </div>
+                  <StatusBadge status={program.status} />
                 </div>
-                <StatusBadge status={program.status} />
+                <p>{program.notes || "项目具体安排以官方页面为准。"}</p>
                 <dl>
                   <div>
                     <dt>开始时间</dt>
-                    <dd>官方未公布</dd>
+                    <dd>{program.startDate ? formatDate(program.startDate) : "官方未公布"}</dd>
                   </div>
                   <div>
                     <dt>截止时间</dt>
-                    <dd>官方未公布</dd>
+                    <dd>{program.endDate ? formatDate(program.endDate) : "官方未公布"}</dd>
                   </div>
                   <div>
-                    <dt>项目流程</dt>
-                    <dd>{program.process}</dd>
+                    <dt>招聘流程</dt>
+                    <dd>{program.process || "以官方项目说明为准"}</dd>
                   </div>
                   <div>
-                    <dt>核验时间</dt>
-                    <dd>{date(program.verifiedAt)}</dd>
+                    <dt>最后核验</dt>
+                    <dd>{formatDate(program.verifiedAt)}</dd>
                   </div>
                 </dl>
-                <p className="program-link-note">
-                  项目申请与证据指向同一官方页面，已合并为页面顶部唯一主入口。
-                </p>
+                <div className="program-source-line">
+                  <ShieldCheck size={16} />
+                  <span>
+                    {program.sourceLink
+                      ? `${linkSourceTypeLabel(program.sourceLink.sourceType)} · ${linkHealthLabel(program.sourceLink.healthStatus)}`
+                      : "来源待补充"}
+                  </span>
+                </div>
               </article>
             ) : (
-              <div className="data-state">
-                <strong>尚未发现明确的 2027 届官方项目</strong>
-                <p>通用招聘网站或校园门户仍可用于观察，但不会据此推断 2027 届项目已经开放。</p>
+              <div className="empty-opportunity">
+                <span>
+                  <CalendarDays size={22} />
+                </span>
+                <div>
+                  <strong>尚未发现明确的 2027 届官方项目</strong>
+                  <p>
+                    招聘门户仍可用于观察，但它不代表 2027
+                    届项目已经开放。我们会在发现官方项目后更新。
+                  </p>
+                </div>
               </div>
             )}
           </section>
 
-          <section className="detail-section">
-            <div className="detail-section-title">
-              <ExternalLinkIcon size={20} />
-              <h2>更多来源与证据</h2>
+          <section className="content-section">
+            <div className="content-section-heading">
+              <BriefcaseBusiness size={20} />
+              <div>
+                <p className="page-kicker">方向参考</p>
+                <h2>适合关注的技术方向</h2>
+              </div>
             </div>
+            <p className="section-description">
+              这些方向来自企业公开业务分类，用于帮助你选择准备重点，不代表当前一定存在对应岗位。
+            </p>
+            <div className="direction-chip-grid">
+              {company.vehicleDirections.map((direction) => (
+                <span key={direction}>
+                  <CheckCircle2 size={16} />
+                  {direction}
+                </span>
+              ))}
+            </div>
+            <p className="relevance-disclaimer">
+              车辆方向相关度参考综合专业相关度、车辆工程关键词、技能匹配和岗位方向；仅为平台规则参考，不代表录用概率。
+            </p>
+          </section>
+
+          <section className="content-section">
+            <div className="content-section-heading">
+              <ExternalLinkIcon size={20} />
+              <div>
+                <p className="page-kicker">官方来源</p>
+                <h2>官方来源与核验记录</h2>
+              </div>
+            </div>
+            {primaryLink ? (
+              <div className="primary-source-summary">
+                <span>{linkSourceTypeLabel(primaryLink.sourceType)}</span>
+                <strong>{primaryLink.title}</strong>
+                <p>{primaryLink.evidenceSummary}</p>
+                <small>
+                  {linkHealthLabel(primaryLink.healthStatus)} · {formatDate(primaryLink.verifiedAt)}{" "}
+                  核验
+                </small>
+              </div>
+            ) : null}
             <div className="source-list detail-source-list">
               {otherLinks.map((link) => (
                 <LinkEvidenceRow companyName={company.name} key={link.id} link={link} />
@@ -149,85 +193,66 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
             </div>
           </section>
 
-          <section className="detail-section">
-            <div className="detail-section-title">
-              <BriefcaseBusiness size={20} />
-              <h2>岗位方向参考</h2>
-            </div>
-            <p className="section-note">
-              以下方向来自企业公开业务分类，用于准备方向选择，不代表当前存在对应岗位或录用概率。
-            </p>
-            <div className="direction-matrix">
-              {company.vehicleDirections.map((direction, index) => (
-                <span key={direction}>
-                  <i>{String(index + 1).padStart(2, "0")}</i>
-                  {direction}
-                </span>
-              ))}
-            </div>
-            <p className="relevance-note">
-              相关度依据：企业业务方向、车辆工程关键词和公开技术领域。平台不展示无法解释的精确匹配分数。
-            </p>
-          </section>
-
-          <section className="detail-section">
-            <div className="detail-section-title">
+          <section className="content-section">
+            <div className="content-section-heading">
               <CircleHelp size={20} />
-              <h2>常见问题</h2>
+              <div>
+                <p className="page-kicker">常见问题</p>
+                <h2>投递前需要知道什么？</h2>
+              </div>
             </div>
             <div className="faq-list">
               <details>
-                <summary>招聘门户存在，是否代表 2027 届已开放？</summary>
-                <p>不是。只有页面明确写明 2027 届项目、实习或届次要求时，才会计入开放项目。</p>
+                <summary>招聘门户存在，是否代表 2027 届已经开放？</summary>
+                <p>不是。只有官方页面明确写明 2027 届项目、实习或届次要求时，才会计入开放项目。</p>
               </details>
               <details>
                 <summary>为什么没有显示截止日期？</summary>
-                <p>当前来源未公布可核验的截止时间。平台不会用 seed 日期或往届时间代替。</p>
+                <p>当前来源没有公布可核验的截止时间，平台不会用往届时间代替。</p>
               </details>
               <details>
                 <summary>链接打不开怎么办？</summary>
-                <p>先查看健康状态。反爬拦截不等于链接失效；已失效链接则不会提供点击入口。</p>
+                <p>先查看链接状态。被反爬拦截不等于链接失效；已经失效的链接不会提供点击入口。</p>
               </details>
             </div>
           </section>
         </main>
 
-        <aside className="detail-aside">
-          <section className="source-ledger">
-            <p className="eyebrow">DECISION SUMMARY</p>
-            <h2>下一步判断</h2>
-            <dl>
-              <div>
-                <dt>2027 项目</dt>
-                <dd>{program ? "有明确证据" : "尚未发布"}</dd>
-              </div>
-              <div>
-                <dt>主入口</dt>
-                <dd>{primaryLink ? "可使用" : "需人工复核"}</dd>
-              </div>
-              <div>
-                <dt>精确日期</dt>
-                <dd>未公布</dd>
-              </div>
-              <div>
-                <dt>具体岗位</dt>
-                <dd>{company.jobs.length ? `${company.jobs.length} 条` : "未核验"}</dd>
-              </div>
-            </dl>
+        <aside className="company-detail-aside">
+          <section className="quick-answer">
+            <p className="page-kicker">快速判断</p>
+            <h2>现在可以做什么？</h2>
+            <ul>
+              <li>
+                <CheckCircle2 size={17} />
+                <span>
+                  <strong>2027 项目</strong>
+                  {program ? "已有明确官方信息，可以查看项目页面。" : "暂未发布，先加入关注清单。"}
+                </span>
+              </li>
+              <li>
+                <Building2 size={17} />
+                <span>
+                  <strong>招聘入口</strong>
+                  {primaryLink ? "当前主入口可使用。" : "暂无可用主入口，等待补充。"}
+                </span>
+              </li>
+              <li>
+                <CalendarDays size={17} />
+                <span>
+                  <strong>时间安排</strong>
+                  {program?.endDate
+                    ? `截止 ${formatDate(program.endDate)}。`
+                    : "截止日期尚未公布。"}
+                </span>
+              </li>
+            </ul>
+            <Link href="/resources">
+              查看求职准备指南
+              <ArrowRight size={16} />
+            </Link>
           </section>
-          <section className="notice-card">
-            <strong>发现链接或届次有误？</strong>
-            <p>提交公司名、正确链接、证据摘要和核验日期，维护者可以直接复核。</p>
-            <a
-              aria-label={`打开 GitHub 提交${company.name}纠错反馈`}
-              href={FEEDBACK_URL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              提交纠错反馈
-              <ArrowRight size={15} />
-            </a>
-          </section>
+          <FeedbackCallout companyName={company.name} />
         </aside>
       </div>
     </div>

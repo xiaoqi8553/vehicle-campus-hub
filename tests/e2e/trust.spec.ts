@@ -1,32 +1,32 @@
 import { expect, test } from "@playwright/test";
 
-test("home search is capped and preserves filters", async ({ page }, testInfo) => {
+test("home search routes to company results with the query", async ({ page }) => {
   await page.goto("/");
-  const explorer = page.getByTestId("company-explorer");
-  await expect(explorer.getByTestId("company-row")).toHaveCount(
-    testInfo.project.name === "mobile" ? 3 : 6,
+  const search = page.getByRole("searchbox", { name: "搜索公司、技术方向或城市" });
+  await search.fill("上海");
+  await search.press("Enter");
+  await expect(page).toHaveURL(/\/companies\?q=%E4%B8%8A%E6%B5%B7/);
+  await expect(page.getByRole("searchbox", { name: "搜索公司、技术方向或城市" })).toHaveValue(
+    "上海",
   );
-  await page.getByRole("searchbox", { name: "搜索公司、城市或车辆方向" }).fill("上海");
-  const allLink = explorer.getByRole("link", { name: /查看全部 \d+ 家企业/ });
-  await expect(allLink).toHaveAttribute("href", /\/companies\?q=%E4%B8%8A%E6%B5%B7/);
 });
 
 test("calendar publishes no precise dates without verified evidence", async ({ page }) => {
   await page.goto("/calendar");
-  await expect(page.getByRole("heading", { name: "2027届车辆行业校招日历" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "车辆行业校招日历" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "已开放但未公布截止日期" })).toBeVisible();
   await expect(page.getByTestId("calendar-event")).toHaveCount(0);
   await expect(page.getByTestId("open-undated-row")).toHaveCount(3);
-  await expect(page.getByTestId("watchlist-row")).toHaveCount(22);
+  await expect(page.getByTestId("watchlist-row")).toHaveCount(0);
   await expect(page.locator("time")).toHaveCount(0);
   await expect(page.locator('a[href*="/campus/0"]')).toHaveCount(0);
 });
 
 test("company detail separates official jobs from direction reference", async ({ page }) => {
   await page.goto("/companies/xiaomi-auto");
-  await expect(page.getByText("2027 届项目判断")).toBeVisible();
-  await expect(page.getByText("岗位方向参考")).toBeVisible();
-  await expect(page.getByText(/平台不展示无法解释的精确匹配分数/)).toBeVisible();
+  await expect(page.getByText("当前校招机会")).toBeVisible();
+  await expect(page.getByText("适合关注的技术方向")).toBeVisible();
+  await expect(page.getByText(/仅为平台规则参考，不代表录用概率/)).toBeVisible();
   await expect(page.locator('a[href*="/campus/0"]')).toHaveCount(0);
 });
 
@@ -86,7 +86,7 @@ test("mobile primary controls provide a 44px interaction target", async ({ brows
   const context = await browser.newContext({ viewport: { width: 375, height: 667 } });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.getByTestId("company-row")).toHaveCount(3);
+  await expect(page.getByTestId("home-opportunity")).toHaveCount(3);
   const controls = page.locator(
     "header a.button:visible, header button:visible, main a.button:visible, main button:visible, main input:visible, main select:visible, main summary:visible, footer a.button:visible, footer button:visible",
   );

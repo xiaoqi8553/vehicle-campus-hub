@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("public preparation resources", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/resources");
-    await expect(page.getByRole("heading", { name: "2027届车辆行业求职资料库" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "车辆行业求职指南" })).toBeVisible();
   });
 
   test("renders six unique platform resources once", async ({ page }) => {
@@ -12,8 +12,8 @@ test.describe("public preparation resources", () => {
     const titles = await resources.locator("h2").allTextContents();
     expect(new Set(titles).size).toBe(titles.length);
     expect(titles.every((title) => !title.includes("平台通用："))).toBe(true);
-    await expect(page.getByText("平台整理，不代表任何企业题库")).toBeVisible();
-    await expect(page.getByRole("link", { name: /阅读全文/ })).toHaveCount(6);
+    await expect(page.getByText("平台整理", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /阅读完整指南/ })).toHaveCount(6);
   });
 
   test("direction and type filters work without fake company resources", async ({ page }) => {

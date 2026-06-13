@@ -11,6 +11,7 @@ prisma/*.db-*
 *.log
 *.tsbuildinfo
 .worktrees/
+.superpowers/
 coverage/
 dist/
 tmp/

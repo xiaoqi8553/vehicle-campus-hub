@@ -1,11 +1,13 @@
 "use client";
 
-import { BookOpen, RotateCcw, Search } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, BookOpen, Clock3, RotateCcw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { ResourceData, CompanyCardData } from "@/lib/data";
+import type { CompanyCardData, ResourceData } from "@/lib/data";
 import { RESOURCE_TYPES } from "@/lib/constants";
 
 type Item = ResourceData & { company: CompanyCardData | null };
+
 const DIRECTIONS = [
   "自动驾驶",
   "嵌入式",
@@ -33,17 +35,20 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
       );
     });
   }, [direction, query, resources, type]);
+  const [featured, ...rest] = filtered;
 
   return (
-    <>
-      <div className="resource-notice">
-        <BookOpen size={19} />
-        <div>
-          <strong>平台整理，不代表任何企业题库</strong>
-          <p>每条资料都包含完整正文与检查清单；没有实际内容的简介不会作为资源发布。</p>
-        </div>
-      </div>
-      <div className="filter-panel resource-filters">
+    <div className="guide-explorer">
+      <div className="guide-filter-panel">
+        <label className="search-field">
+          <Search size={18} />
+          <input
+            aria-label="搜索求职指南"
+            placeholder="搜索知识点、技术方向或面试主题"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </label>
         <div className="direction-tabs" aria-label="车辆方向资料分组">
           <button
             className={!direction ? "active" : ""}
@@ -64,15 +69,6 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
           ))}
         </div>
         <div className="resource-filter-grid">
-          <label className="search-field">
-            <Search size={17} />
-            <input
-              aria-label="搜索资料"
-              placeholder="搜索知识点或方向"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </label>
           <label>
             <span>资料类型</span>
             <select
@@ -96,42 +92,82 @@ export function ResourceExplorer({ resources }: { resources: Item[] }) {
             }}
           >
             <RotateCcw size={15} />
-            重置
+            重置筛选
           </button>
         </div>
       </div>
-      <div className="resource-list">
-        {filtered.map((item, index) => (
-          <article className="resource-row" data-testid="resource-row" key={item.id}>
-            <span className="resource-number">{String(index + 1).padStart(2, "0")}</span>
-            <div className="resource-content">
-              <p>
-                {item.type} · {item.source}
-              </p>
-              <h2>{item.title}</h2>
-              <span>{item.summary}</span>
-              <div className="tag-row">
-                {item.tags.map((tag) => (
-                  <i key={tag}>{tag}</i>
-                ))}
-              </div>
+
+      {featured ? (
+        <article className="featured-guide" data-testid="resource-row">
+          <div>
+            <span className="guide-origin">平台整理</span>
+            <p className="page-kicker">推荐先读</p>
+            <h2>车辆行业校招准备路线图</h2>
+            <p>从岗位方向、简历项目、笔试知识点到面试复盘，先用一篇完整指南建立准备顺序。</p>
+            <div className="tag-row">
+              {featured.tags.slice(0, 4).map((tag) => (
+                <span className="tag" key={tag}>
+                  {tag}
+                </span>
+              ))}
             </div>
-            <div className="resource-source">
-              <strong>平台整理</strong>
-              <span>{item.content.length} 个章节</span>
-              <a href={`/resources/${item.id}`} aria-label={`阅读全文：${item.title}`}>
-                阅读全文
-              </a>
+            <Link href={`/resources/${featured.id}`} aria-label={`阅读完整指南：${featured.title}`}>
+              阅读完整指南
+              <ArrowRight size={17} />
+            </Link>
+          </div>
+          <div className="featured-guide-visual" aria-hidden="true">
+            <span>01</span>
+            <span>02</span>
+            <span>03</span>
+            <BookOpen size={34} />
+          </div>
+          <h3 className="sr-only">{featured.title}</h3>
+        </article>
+      ) : null}
+
+      {rest.length ? (
+        <section className="guide-list-section">
+          <div className="section-title">
+            <div>
+              <p className="page-kicker">按主题阅读</p>
+              <h2>继续完善你的准备清单</h2>
             </div>
-          </article>
-        ))}
-      </div>
-      {!filtered.length && (
+          </div>
+          <div className="guide-card-grid">
+            {rest.map((item) => (
+              <article className="guide-card" data-testid="resource-row" key={item.id}>
+                <span className="guide-origin">平台整理</span>
+                <p>{item.type}</p>
+                <h2>{item.title}</h2>
+                <span>{item.summary}</span>
+                <div className="tag-row">
+                  {item.tags.slice(0, 4).map((tag) => (
+                    <i key={tag}>{tag}</i>
+                  ))}
+                </div>
+                <div className="guide-card-footer">
+                  <small>
+                    <Clock3 size={14} />
+                    {item.content.length} 个章节
+                  </small>
+                  <Link href={`/resources/${item.id}`} aria-label={`阅读完整指南：${item.title}`}>
+                    阅读完整指南
+                    <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {!filtered.length ? (
         <div className="data-state">
-          <strong>暂无匹配资料</strong>
+          <strong>暂无匹配指南</strong>
           <p>调整方向、类型或搜索关键词。</p>
         </div>
-      )}
-    </>
+      ) : null}
+    </div>
   );
 }

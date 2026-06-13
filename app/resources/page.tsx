@@ -1,5 +1,7 @@
+import { BookOpenCheck, Route } from "lucide-react";
 import { ResourceExplorer } from "@/components/resource/resource-explorer";
 import { DataState } from "@/components/ui/data-state";
+import { PageHero } from "@/components/ui/page-hero";
 import { getResources } from "@/lib/data";
 
 export default async function ResourcesPage() {
@@ -7,13 +9,23 @@ export default async function ResourcesPage() {
     const resources = await getResources();
     return (
       <div className="shell page-space">
-        <div className="page-heading">
-          <p className="eyebrow">PREPARATION LIBRARY / {resources.length} GUIDES</p>
-          <h1>2027届车辆行业求职资料库</h1>
-          <p>
-            公共方法资料只保留一次，不再为每家公司复制模板。所有内容均明确区分平台整理与外部来源。
-          </p>
-        </div>
+        <PageHero
+          eyebrow="求职指南"
+          title="车辆行业求职指南"
+          description="从简历准备到技术面试，按车辆技术方向整理完整阅读材料。每篇内容都包含正文、章节和可执行检查清单。"
+          aside={
+            <div className="page-stat-pills">
+              <span>
+                <BookOpenCheck size={16} />
+                {resources.length} 篇完整指南
+              </span>
+              <span>
+                <Route size={16} />
+                适用 2027 届
+              </span>
+            </div>
+          }
+        />
         <ResourceExplorer resources={resources} />
       </div>
     );
