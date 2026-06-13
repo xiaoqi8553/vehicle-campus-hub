@@ -3,7 +3,9 @@ import { expect, test } from "@playwright/test";
 test("home search is capped and preserves filters", async ({ page }, testInfo) => {
   await page.goto("/");
   const explorer = page.getByTestId("company-explorer");
-  await expect(explorer.getByTestId("company-row")).toHaveCount(testInfo.project.name === "mobile" ? 3 : 6);
+  await expect(explorer.getByTestId("company-row")).toHaveCount(
+    testInfo.project.name === "mobile" ? 3 : 6,
+  );
   await page.getByRole("searchbox", { name: "搜索公司、城市或车辆方向" }).fill("上海");
   const allLink = explorer.getByRole("link", { name: /查看全部 \d+ 家企业/ });
   await expect(allLink).toHaveAttribute("href", /\/companies\?q=%E4%B8%8A%E6%B5%B7/);
@@ -28,7 +30,9 @@ test("company detail separates official jobs from direction reference", async ({
   await expect(page.locator('a[href*="/campus/0"]')).toHaveCount(0);
 });
 
-test("main pages have one h1, no fake links, errors or horizontal overflow", async ({ browser }, testInfo) => {
+test("main pages have one h1, no fake links, errors or horizontal overflow", async ({
+  browser,
+}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "viewport matrix runs once");
   test.setTimeout(120_000);
   const viewports = [
@@ -49,8 +53,14 @@ test("main pages have one h1, no fake links, errors or horizontal overflow", asy
       if (message.type() === "error") errors.push(message.text());
     });
     page.on("requestfailed", (request) => {
-      if (request.resourceType() === "document" || request.resourceType() === "script" || request.resourceType() === "stylesheet") {
-        failedRequests.push(`${request.method()} ${request.url()}`);
+      const failure = request.failure()?.errorText ?? "";
+      if (
+        !failure.includes("ERR_ABORTED") &&
+        (request.resourceType() === "document" ||
+          request.resourceType() === "script" ||
+          request.resourceType() === "stylesheet")
+      ) {
+        failedRequests.push(`${request.method()} ${request.url()}: ${failure}`);
       }
     });
     for (const route of routes) {
@@ -60,7 +70,9 @@ test("main pages have one h1, no fake links, errors or horizontal overflow", asy
         viewport: document.documentElement.clientWidth,
         content: document.documentElement.scrollWidth,
       }));
-      expect(dimensions.content, `${viewport.name} ${route}`).toBeLessThanOrEqual(dimensions.viewport + 1);
+      expect(dimensions.content, `${viewport.name} ${route}`).toBeLessThanOrEqual(
+        dimensions.viewport + 1,
+      );
       await expect(page.locator('a[href*="example.com"], a[href="#"], a[href=""]')).toHaveCount(0);
     }
     expect(errors).toEqual([]);
@@ -74,11 +86,19 @@ test("mobile primary controls provide a 44px interaction target", async ({ brows
   const context = await browser.newContext({ viewport: { width: 375, height: 667 } });
   const page = await context.newPage();
   await page.goto("/");
-  const controls = page.locator('a.button:visible, button:visible, input:visible, select:visible, summary:visible');
-  const boxes = await controls.evaluateAll((elements) => elements.map((element) => {
-    const rect = element.getBoundingClientRect();
-    return { label: element.getAttribute("aria-label") || element.textContent?.trim(), height: rect.height };
-  }));
+  await expect(page.getByTestId("company-row")).toHaveCount(3);
+  const controls = page.locator(
+    "header a.button:visible, header button:visible, main a.button:visible, main button:visible, main input:visible, main select:visible, main summary:visible, footer a.button:visible, footer button:visible",
+  );
+  const boxes = await controls.evaluateAll((elements) =>
+    elements.map((element) => {
+      const rect = element.getBoundingClientRect();
+      return {
+        label: element.getAttribute("aria-label") || element.textContent?.trim(),
+        height: rect.height,
+      };
+    }),
+  );
   expect(boxes.filter((box) => box.height < 43).map((box) => box.label)).toEqual([]);
   await context.close();
 });

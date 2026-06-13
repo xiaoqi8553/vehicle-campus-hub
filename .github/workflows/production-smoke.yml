@@ -1,0 +1,92 @@
+name: Production Smoke
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Commit SHA expected in production
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  verify-production:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      PRODUCTION_URL: https://vehicle-campus-hub.vercel.app
+      EXPECTED_COMMIT: ${{ inputs.expected_commit || github.event.workflow_run.head_sha || github.sha }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_commit || github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Pull Vercel Production configuration
+        run: npx --yes vercel@54.12.2 pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Apply Production database migrations
+        run: node --env-file=.vercel/.env.production.local node_modules/prisma/build/index.js migrate deploy
+
+      - name: Build Production
+        run: npx --yes vercel@54.12.2 build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy Production
+        id: deploy
+        shell: bash
+        run: |
+          url="$(npx --yes vercel@54.12.2 deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}")"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployment URL: $url"
+
+      - name: Wait for Vercel to expose the expected commit
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            health="$(curl --fail --silent --show-error "$PRODUCTION_URL/api/health" || true)"
+            deployed_commit="$(printf '%s' "$health" | jq -r '.commit // empty')"
+            if [[ "$deployed_commit" == "$EXPECTED_COMMIT" ]]; then
+              printf '%s\n' "$health" | jq .
+              exit 0
+            fi
+            echo "Attempt $attempt: expected $EXPECTED_COMMIT, found ${deployed_commit:-unavailable}"
+            sleep 10
+          done
+          echo "Production did not deploy commit $EXPECTED_COMMIT within 10 minutes."
+          exit 1
+
+      - name: Run production browser smoke test
+        env:
+          SMOKE_BASE_URL: ${{ env.PRODUCTION_URL }}
+        run: npm run test:smoke
+
+      - name: Create immutable deployment tag
+        shell: bash
+        run: |
+          short_sha="${EXPECTED_COMMIT:0:7}"
+          tag="deploy-$(date -u +%Y%m%d-%H%M)-${short_sha}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag" "$EXPECTED_COMMIT" -m "Production deployment $PRODUCTION_URL"
+          git push origin "$tag"
+          echo "### Production deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: $PRODUCTION_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`$EXPECTED_COMMIT\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: \`$tag\`" >> "$GITHUB_STEP_SUMMARY"

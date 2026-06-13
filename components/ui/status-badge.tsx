@@ -7,5 +7,7 @@ const statusClasses: Record<string, string> = {
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  return <span className={`status-badge ${statusClasses[status] ?? "status-unknown"}`}>{status}</span>;
+  return (
+    <span className={`status-badge ${statusClasses[status] ?? "status-unknown"}`}>{status}</span>
+  );
 }

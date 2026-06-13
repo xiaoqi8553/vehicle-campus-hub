@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { isPlaceholderExternalUrl } from "@/lib/domain";
 
 const prisma = new PrismaClient();
 
@@ -78,16 +79,22 @@ async function main() {
   }
 
   const resources = await prisma.resource.findMany();
-  console.log(JSON.stringify({
-    total: resources.length,
-    official: resources.filter((item) => item.credibility === "官方").length,
-    trusted: resources.filter((item) => item.credibility === "较可信").length,
-    experience: resources.filter((item) => item.credibility === "经验参考").length,
-    emptyUrls: resources.filter((item) => !item.url).length,
-    placeholderUrls: resources.filter((item) => item.url?.includes("example.com")).length,
-    uniqueTitles: new Set(resources.map((item) => item.title)).size,
-    uniqueSummaries: new Set(resources.map((item) => item.summary)).size,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        total: resources.length,
+        official: resources.filter((item) => item.credibility === "官方").length,
+        trusted: resources.filter((item) => item.credibility === "较可信").length,
+        experience: resources.filter((item) => item.credibility === "经验参考").length,
+        emptyUrls: resources.filter((item) => !item.url).length,
+        placeholderUrls: resources.filter((item) => isPlaceholderExternalUrl(item.url)).length,
+        uniqueTitles: new Set(resources.map((item) => item.title)).size,
+        uniqueSummaries: new Set(resources.map((item) => item.summary)).size,
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 main()

@@ -19,7 +19,8 @@ export function ExternalLink({
   if (!safeUrl) return <span className={`${className} button-disabled`}>{emptyLabel}</span>;
   return (
     <a aria-label={ariaLabel} className={className} href={safeUrl} target="_blank" rel="noreferrer">
-      {children}<ExternalLinkIcon size={15} />
+      {children}
+      <ExternalLinkIcon size={15} />
     </a>
   );
 }

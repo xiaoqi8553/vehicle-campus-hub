@@ -77,16 +77,7 @@ const VEHICLE_DIRECTIONS = [
   "制造工艺",
 ];
 
-const RELATED_MAJORS = [
-  "车辆",
-  "机械",
-  "自动化",
-  "控制",
-  "电子",
-  "计算机",
-  "软件",
-  "能源",
-];
+const RELATED_MAJORS = ["车辆", "机械", "自动化", "控制", "电子", "计算机", "软件", "能源"];
 
 export function vehicleRelevance(input: VehicleRelevanceInput): {
   level: "高相关" | "中相关" | "低相关";
@@ -153,14 +144,23 @@ export function generateVehicleAdvice(tags: string[], directions: string[]): str
   return [...new Set(advice.length ? advice : ["车辆工程基础", "项目复盘", "岗位定向简历"])];
 }
 
+export function isPlaceholderExternalUrl(url: string | null | undefined): boolean {
+  if (!url?.trim()) return false;
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname === "example.com" || hostname.endsWith(".example.com");
+  } catch {
+    return false;
+  }
+}
+
 export function safeExternalUrl(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try {
     const parsed = new URL(url);
     const hostname = parsed.hostname.toLowerCase();
     const isPlaceholder =
-      hostname === "example.com" ||
-      hostname.endsWith(".example.com") ||
+      isPlaceholderExternalUrl(url) ||
       hostname === "localhost" ||
       hostname === "0.0.0.0" ||
       hostname === "127.0.0.1";
@@ -196,8 +196,8 @@ export type LinkEvidenceInput = {
 
 export function isUsableLinkEvidence(link: LinkEvidenceInput): boolean {
   return Boolean(
-    safeExternalUrl(link.url)
-    && ["OK", "BROWSER_ONLY", "REDIRECTED"].includes(link.healthStatus ?? ""),
+    safeExternalUrl(link.url) &&
+    ["OK", "BROWSER_ONLY", "REDIRECTED"].includes(link.healthStatus ?? ""),
   );
 }
 
@@ -210,7 +210,9 @@ export function isCohortEvidence(
   cohort: number,
 ): boolean {
   if (!isUsableLinkEvidence(link)) return false;
-  if (!["COHORT_PROJECT", "CAMPUS_PORTAL", "OFFICIAL_ANNOUNCEMENT"].includes(link.sourceType ?? "")) {
+  if (
+    !["COHORT_PROJECT", "CAMPUS_PORTAL", "OFFICIAL_ANNOUNCEMENT"].includes(link.sourceType ?? "")
+  ) {
     return false;
   }
   const cohortText = `${link.targetCohort ?? ""} ${link.evidenceSummary ?? ""}`;
@@ -218,26 +220,30 @@ export function isCohortEvidence(
 }
 
 export function linkSourceTypeLabel(value: string | null | undefined): string {
-  return {
-    COHORT_PROJECT: "2027 届具体项目",
-    CAMPUS_PORTAL: "校园招聘门户",
-    CAREERS_SITE: "通用招聘官网",
-    OFFICIAL_ANNOUNCEMENT: "官方招聘公告",
-    TALENT_PAGE: "企业人才介绍页",
-    COMPANY_WEBSITE: "企业官网",
-    TRUSTED_THIRD_PARTY: "第三方可信来源",
-  }[value ?? ""] ?? "来源类型待确认";
+  return (
+    {
+      COHORT_PROJECT: "2027 届具体项目",
+      CAMPUS_PORTAL: "校园招聘门户",
+      CAREERS_SITE: "通用招聘官网",
+      OFFICIAL_ANNOUNCEMENT: "官方招聘公告",
+      TALENT_PAGE: "企业人才介绍页",
+      COMPANY_WEBSITE: "企业官网",
+      TRUSTED_THIRD_PARTY: "第三方可信来源",
+    }[value ?? ""] ?? "来源类型待确认"
+  );
 }
 
 export function linkHealthLabel(value: string | null | undefined): string {
-  return {
-    OK: "可正常访问",
-    BROWSER_ONLY: "仅浏览器可访问",
-    BLOCKED: "被反爬拦截",
-    REDIRECTED: "已重定向",
-    DEAD: "已失效",
-    MANUAL_REVIEW: "待人工确认",
-  }[value ?? ""] ?? "待人工确认";
+  return (
+    {
+      OK: "可正常访问",
+      BROWSER_ONLY: "仅浏览器可访问",
+      BLOCKED: "被反爬拦截",
+      REDIRECTED: "已重定向",
+      DEAD: "已失效",
+      MANUAL_REVIEW: "待人工确认",
+    }[value ?? ""] ?? "待人工确认"
+  );
 }
 
 export function externalDomain(url: string | null | undefined): string {
@@ -245,12 +251,7 @@ export function externalDomain(url: string | null | undefined): string {
   return safeUrl ? new URL(safeUrl).hostname.replace(/^www\./, "") : "无有效域名";
 }
 
-export type EvidenceSourceType =
-  | "OFFICIAL"
-  | "SCHOOL"
-  | "PUBLIC"
-  | "EXPERIENCE"
-  | "UNKNOWN";
+export type EvidenceSourceType = "OFFICIAL" | "SCHOOL" | "PUBLIC" | "EXPERIENCE" | "UNKNOWN";
 
 export type DateConfidence = "VERIFIED" | "ESTIMATED" | "UNKNOWN";
 
@@ -258,9 +259,8 @@ export function normalizeSourceType(
   value: string | null | undefined,
   url?: string | null,
 ): EvidenceSourceType {
-  if (!safeExternalUrl(url)) return value === "EXPERIENCE" || value === "候选人经验"
-    ? "EXPERIENCE"
-    : "UNKNOWN";
+  if (!safeExternalUrl(url))
+    return value === "EXPERIENCE" || value === "候选人经验" ? "EXPERIENCE" : "UNKNOWN";
 
   const sourceMap: Record<string, EvidenceSourceType> = {
     OFFICIAL: "OFFICIAL",
@@ -278,13 +278,15 @@ export function normalizeSourceType(
 }
 
 export function sourceTypeLabel(value: string | null | undefined): string {
-  return {
-    OFFICIAL: "官方招聘站",
-    SCHOOL: "学校就业网",
-    PUBLIC: "公开整理",
-    EXPERIENCE: "候选人经验",
-    UNKNOWN: "来源待补",
-  }[value ?? "UNKNOWN"] ?? "来源待补";
+  return (
+    {
+      OFFICIAL: "官方招聘站",
+      SCHOOL: "学校就业网",
+      PUBLIC: "公开整理",
+      EXPERIENCE: "候选人经验",
+      UNKNOWN: "来源待补",
+    }[value ?? "UNKNOWN"] ?? "来源待补"
+  );
 }
 
 type CalendarEvidenceEvent = {
@@ -302,12 +304,12 @@ export function hasVerifiedCalendarEvidence(event: CalendarEvidenceEvent): boole
   const sourceType = normalizeSourceType(event.sourceType, event.sourceUrl);
   const date = event.eventDate ? new Date(event.eventDate) : null;
   return Boolean(
-    date
-    && !Number.isNaN(date.getTime())
-    && event.verifiedAt
-    && event.dateConfidence === "VERIFIED"
-    && ["OFFICIAL", "SCHOOL", "PUBLIC"].includes(sourceType)
-    && safeExternalUrl(event.sourceUrl),
+    date &&
+    !Number.isNaN(date.getTime()) &&
+    event.verifiedAt &&
+    event.dateConfidence === "VERIFIED" &&
+    ["OFFICIAL", "SCHOOL", "PUBLIC"].includes(sourceType) &&
+    safeExternalUrl(event.sourceUrl),
   );
 }
 
@@ -341,9 +343,9 @@ export function groupCalendarEvents<T extends CalendarEvidenceEvent>(
     } else if (event.eventType === "网申截止" && daysAway > 7 && daysAway <= 30) {
       thirtyDays.push(event);
     } else if (
-      event.eventType === "网申开始"
-      && eventDate.getUTCFullYear() === now.getUTCFullYear()
-      && eventDate.getUTCMonth() === now.getUTCMonth()
+      event.eventType === "网申开始" &&
+      eventDate.getUTCFullYear() === now.getUTCFullYear() &&
+      eventDate.getUTCMonth() === now.getUTCMonth()
     ) {
       currentMonth.push(event);
     }

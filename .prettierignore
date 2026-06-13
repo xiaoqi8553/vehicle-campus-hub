@@ -1,0 +1,10 @@
+.next
+node_modules
+playwright-report
+playwright-report-production
+test-results
+docs/audit
+docs/benchmarks
+docs/redesign
+prisma/migrations-sqlite-archive
+package-lock.json

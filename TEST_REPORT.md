@@ -1,5 +1,46 @@
 # Vehicle Campus Hub 测试报告
 
+## 2026-06-11 工程治理与 PostgreSQL 迁移
+
+### 已完成
+
+- 创建并推送稳定基线 tag `v2.1.0`，对应 commit `f3480ca`。
+- 建立 `codex/project-governance` 功能分支和 Conventional Commits 规范。
+- 新增 PostgreSQL 16 CI，覆盖 migration、seed、数据校验、格式、lint、typecheck、unit、build 和完整 E2E。
+- Prisma datasource 从 SQLite 改为 PostgreSQL，旧 migrations 移入只读归档。
+- `prisma/dev.db` 已停止 Git 跟踪，本地文件仍保留用于一次性数据迁移。
+- 新增 SQLite→PostgreSQL 迁移、数量/关联校验、Neon 恢复点和生产 smoke 工具。
+- 新增 Release Please、CodeQL、Dependabot、每周外链巡检和部署标签工作流。
+- 新增 `/api/health`，用于校验生产版本、commit 和部署环境。
+- 新增贡献、发布、回退、安全和 ADR 文档。
+
+### 自动验证
+
+| 检查                          | 结果       |
+| ----------------------------- | ---------- |
+| GitHub Actions CI             | 通过       |
+| PostgreSQL baseline migration | 通过       |
+| PostgreSQL seed               | 通过       |
+| 数据库数量与关联校验          | 通过       |
+| UTF-8 / BOM 校验              | 通过       |
+| Prettier                      | 通过       |
+| ESLint                        | 通过       |
+| TypeScript                    | 通过       |
+| Unit                          | 13/13 通过 |
+| Next.js build                 | 通过       |
+| Playwright E2E                | 通过       |
+
+CI run：<https://github.com/xiaoqi8553/vehicle-campus-hub/actions/runs/27359454683>
+
+首次 CI 在 `prisma migrate deploy` 失败，根因是 `migration_lock.toml` 带 UTF-8 BOM。去除 BOM 并把 BOM 检查加入 `check:utf8` 后，第二次 CI 全部通过。
+
+### 待账户授权
+
+- GitHub CLI 尚未登录，因此 GitHub Release、PR 创建和 `main` Ruleset 尚未完成。
+- Vercel 账户尚未添加 GitHub Login Connection，因此项目不能绑定 Git 自动 Preview/Production。
+- Neon Marketplace 条款尚未由账户所有者确认，因此尚未创建生产 PostgreSQL、迁移生产数据或执行 Neon 回退演练。
+- 在上述授权完成前，不部署 PostgreSQL 版本到生产，避免当前线上站点因缺少 `DATABASE_URL` 中断。
+
 ## 2026-06-11 2.0 结构重构
 
 ### 原有问题
@@ -102,29 +143,29 @@
 
 ### 数据与来源审计
 
-| 检查项 | 结果 |
-| --- | ---: |
-| 公司 | 25 |
-| 校招跟踪项目 | 25 |
-| 岗位方向参考 | 75 |
-| 资料 | 50 |
-| 日历观察记录 | 25 |
-| 已核验可达招聘入口 | 3 |
-| 缺少招聘入口 | 20 |
-| 有入口但需重新核验 | 2 |
-| 未核验精确日历日期 | 0 |
-| 已核验官方资源 | 3 |
+| 检查项             | 结果 |
+| ------------------ | ---: |
+| 公司               |   25 |
+| 校招跟踪项目       |   25 |
+| 岗位方向参考       |   75 |
+| 资料               |   50 |
+| 日历观察记录       |   25 |
+| 已核验可达招聘入口 |    3 |
+| 缺少招聘入口       |   20 |
+| 有入口但需重新核验 |    2 |
+| 未核验精确日历日期 |    0 |
+| 已核验官方资源     |    3 |
 
 真实浏览器复核：小米、比亚迪、博世招聘入口可正常打开；宁德时代当前网络连接关闭，电装返回 403，因此后两者已撤销人工核验时间，保留为待核实入口。
 
 ### 四种视口
 
-| 视口 | 横向滚动 | 主要操作热区 | 页面错误 |
-| --- | --- | --- | --- |
-| iPhone SE `375×667` | 无 | ≥44px | 无 |
-| iPhone 14 `390×844` | 无 | ≥44px | 无 |
-| iPad `820×1180` | 无 | 通过 | 无 |
-| Desktop `1440×1000` | 无 | 通过 | 无 |
+| 视口                | 横向滚动 | 主要操作热区 | 页面错误 |
+| ------------------- | -------- | ------------ | -------- |
+| iPhone SE `375×667` | 无       | ≥44px        | 无       |
+| iPhone 14 `390×844` | 无       | ≥44px        | 无       |
+| iPad `820×1180`     | 无       | 通过         | 无       |
+| Desktop `1440×1000` | 无       | 通过         | 无       |
 
 覆盖页面：`/`、`/companies`、`/companies/xiaomi-auto`、`/calendar`、`/resources`。筛选控件均有可访问名称，`focus-visible` 清晰，未发现 hydration error、page error、严重 console error 或非预期失败请求。
 
@@ -176,17 +217,17 @@ Playwright 并发固定为 4、单测试超时 60 秒，避免 8 worker 同时�
 
 ### 数据审计
 
-| 检查项 | 结果 |
-| --- | ---: |
-| 公司 | 25 |
-| 2027届校招项目 | 25 |
-| 岗位 | 75 |
-| 资源 | 50 |
-| 日历事件 | 25 |
-| 有校招/投递入口企业 | 5 |
-| 有来源链接资源 | 5 |
-| 有来源链接日历事件 | 5 |
-| `example.com` 占位链接 | 0 |
+| 检查项                 | 结果 |
+| ---------------------- | ---: |
+| 公司                   |   25 |
+| 2027届校招项目         |   25 |
+| 岗位                   |   75 |
+| 资源                   |   50 |
+| 日历事件               |   25 |
+| 有校招/投递入口企业    |    5 |
+| 有来源链接资源         |    5 |
+| 有来源链接日历事件     |    5 |
+| `example.com` 占位链接 |    0 |
 
 ### 自动验证结果
 
@@ -284,16 +325,16 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 
 ## 内容审计
 
-| 检查项 | 修复后结果 |
-| --- | ---: |
-| 资源总数 | 50 |
-| 官方资料 | 2 |
-| 较可信 | 23 |
-| 经验参考 | 25 |
-| 空链接/禁用链接 | 48 |
-| `example.com` 链接 | 0 |
-| 唯一标题 | 50 |
-| 唯一摘要模板 | 8 |
+| 检查项             | 修复后结果 |
+| ------------------ | ---------: |
+| 资源总数           |         50 |
+| 官方资料           |          2 |
+| 较可信             |         23 |
+| 经验参考           |         25 |
+| 空链接/禁用链接    |         48 |
+| `example.com` 链接 |          0 |
+| 唯一标题           |         50 |
+| 唯一摘要模板       |          8 |
 
 “官方”资料现在只对应企业官方域名；没有可核验入口的公开整理不再标记为官方。
 
@@ -353,3 +394,59 @@ Windows Computer Use 原生连接不可用，因此按照任务要求改用 Play
 2. 企业招聘 URL 可能改版或下线，建议增加定时 HEAD/GET 检查和人工复核队列。
 3. “热门资料”需要接入真实点击、收藏或使用数据后再上线。
 4. seed 仍是产品演示数据，不代表 2026 年 6 月 9 日的实时招聘批次。
+
+---
+
+## 2026-06-12 工程规范化与 PostgreSQL 迁移验收
+
+### 原有问题
+
+1. 仓库没有 CI、正式发布流程、部署标签和受保护的 `main` 工作流。
+2. Prisma 使用被 Git 跟踪的 SQLite 运行数据库，无法支持可靠的 Vercel 生产持久化与恢复。
+3. GitHub、Vercel、数据库和生产部署之间缺少可核对的 commit 记录。
+4. 生产构建下，公司列表点击详情会发出成功的 RSC 请求，但 Next.js 客户端路由不提交 URL，用户停留在列表页。
+
+### 数据库与工程变更
+
+- Prisma datasource 已从 SQLite 改为 PostgreSQL。
+- SQLite migrations 已归档，新增 PostgreSQL baseline migration。
+- Neon Marketplace 资源：`vehicle-campus-hub-db`，project id `bitter-rain-33120568`。
+- Vercel Production、Preview、Development 已连接 Neon；迁移连接优先使用 `DIRECT_URL` 或 `DATABASE_URL_UNPOOLED`。
+- SQLite 数据已通过事务导入 Neon，并执行数量与关联校验。
+- 生产数据基线：Company 25、CompanyLink 51、Recruitment 3、Resource 6。
+- 22 家企业有可用招聘或企业入口；只有 3 家具备明确的 2027 届项目证据，剩余 22 家仍需人工补充官方证据。
+
+### CI/CD 与回退能力
+
+- GitHub Actions 门禁覆盖 Prisma generate、PostgreSQL migration、seed、数据库校验、UTF-8、format、lint、typecheck、unit、build 和完整 Playwright。
+- PR 由 GitHub Actions 创建 Vercel Preview。
+- `main` CI 成功后由 GitHub Actions 构建并部署 Vercel Production。
+- 生产 smoke 校验 `/api/health.commit`，通过后创建 `deploy-日期-短SHA` 标签。
+- Release Please 维护版本 PR、CHANGELOG、tag 和 GitHub Release。
+- 新增 `CONTRIBUTING.md`、`RELEASE.md`、`ROLLBACK.md`、`SECURITY.md`、ADR、PR 和 Issue 模板。
+- `main` 已要求 PR、`quality`、`pull-request-title`、`analyze`、`deploy-preview`、`CodeQL`，并禁止 force push 和分支删除。
+- Secret Scanning、Push Protection 与 Dependabot security updates 已启用。
+
+### 本轮修复
+
+1. Playwright 改为测试 `next build && next start` 的生产构建，不再以开发服务器结果代替生产行为。
+2. 公司详情完整 RSC 树在 Next 15 客户端切换时出现稳定挂起；直接访问正常、响应为 200 且无控制台错误。公司详情入口改为标准同站文档导航，真实点击连续 3 次通过。
+3. 移动端 44px 热区测试先等待首页列表稳定为 3 条，避免在响应式 `useEffect` 切换期间测量即将卸载的节点。
+4. Playwright 控件扫描限定在应用的 header、main、footer，避免把框架开发工具注入节点误判为产品控件。
+5. CodeQL 发现资源刷新脚本使用 URL 子串统计占位域名；现已改为解析 hostname，并覆盖路径文本和伪装域名绕过测试。
+6. CI 复测发现资源详情存在同类客户端动态路由挂起，现统一改为标准同站文档导航；多路由巡检只忽略浏览器主动取消的 `ERR_ABORTED` 预取请求。
+7. Preview 曾与其他部署同时执行生产迁移并争抢 PostgreSQL advisory lock；Vercel 默认构建现仅执行 build，只有 Production workflow 显式加载生产环境并运行 `migrate deploy`。
+
+### 最终本地结果
+
+- `npm run test:e2e`：通过，50 passed、2 skipped、0 failed。
+- `npm run test:unit`：通过，14 passed、0 failed。
+- `npm run lint`：通过，0 errors。
+- `npm run typecheck`：通过。
+- `npm run build`：通过，15 个静态/动态页面与 API 路由完成生产构建。
+- PostgreSQL migration、SQLite import、seed 和数据库校验：通过。
+
+### 仍需人工确认
+
+1. 22 家企业缺少可证明 2027 届项目开放的官方证据，不能根据通用招聘门户推断为已开放。
+2. Neon 数据恢复演练应在非生产 branch 执行，避免为验证流程扰动生产数据。
