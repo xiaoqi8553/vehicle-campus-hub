@@ -23,7 +23,7 @@ jobs:
         env:
           AUDIT_BASE_URL: https://vehicle-campus-hub.vercel.app
         run: npx tsx scripts/audit-production-links.ts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: weekly-link-health-report
           path: tmp/production-link-health.json
