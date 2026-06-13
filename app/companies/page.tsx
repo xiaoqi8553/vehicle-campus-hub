@@ -1,6 +1,9 @@
+import { Building2, CheckCircle2 } from "lucide-react";
 import { CompanyExplorer } from "@/components/company/company-explorer";
 import { DataState } from "@/components/ui/data-state";
+import { PageHero } from "@/components/ui/page-hero";
 import { getCompanies } from "@/lib/data";
+import { isCohortEvidence, isUsableLinkEvidence } from "@/lib/domain";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -12,15 +15,36 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
   try {
     const companies = await getCompanies();
     const params = await searchParams;
+    const openCount = companies.filter(
+      (company) =>
+        company.recruitments?.some(
+          (item) => item.targetYear === 2027 && item.status.includes("开放"),
+        ) && company.links?.some((link) => isCohortEvidence(link, 2027)),
+    ).length;
+    const linkCount = companies.filter((company) =>
+      company.links?.some((link) => link.isPrimary && isUsableLinkEvidence(link)),
+    ).length;
+
     return (
       <div className="shell page-space">
-        <div className="page-heading">
-          <p className="eyebrow">COMPANY INTELLIGENCE / {companies.length} RECORDS</p>
-          <h1>2027届车辆行业公司情报库</h1>
-          <p>
-            默认按明确开放项目、最近核验时间和公司名排序。每行只保留一个主入口，其余证据收进来源列表。
-          </p>
-        </div>
+        <PageHero
+          eyebrow="公司机会"
+          title="寻找适合你的车辆企业"
+          description="按技术方向、公司类型和当前招聘状态筛选。明确开放的 2027 届项目优先展示，通用招聘入口不会被当作已开放项目。"
+          aside={
+            <div className="page-stat-pills">
+              <span>
+                <Building2 size={16} />
+                {companies.length} 家企业
+              </span>
+              <span>
+                <CheckCircle2 size={16} />
+                {openCount} 个明确项目
+              </span>
+              <span>{linkCount} 个可用入口</span>
+            </div>
+          }
+        />
         <CompanyExplorer
           companies={companies}
           showSort

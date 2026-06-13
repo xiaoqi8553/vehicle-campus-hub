@@ -13,7 +13,7 @@ export default function ErrorPage({
   useEffect(() => console.error(error), [error]);
   return (
     <div className="shell page-space">
-      <DataState description="页面数据请求失败，但应用仍可继续使用。请重试或稍后刷新。" />
+      <DataState />
       <button className="button button-primary state-action" onClick={reset}>
         重新加载
       </button>

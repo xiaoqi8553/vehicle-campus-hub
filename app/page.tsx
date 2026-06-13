@@ -1,161 +1,223 @@
 import Link from "next/link";
-import { ArrowRight, Clock3, SearchCheck, ShieldCheck } from "lucide-react";
-import { CompanyLinkAction } from "@/components/company/company-link";
-import { CompanyExplorer } from "@/components/company/company-explorer";
+import {
+  ArrowRight,
+  BatteryCharging,
+  Bot,
+  CarFront,
+  CheckCircle2,
+  CircuitBoard,
+  Gauge,
+  Search,
+  ShieldCheck,
+  Wrench,
+} from "lucide-react";
+import { OpportunityCard } from "@/components/home/opportunity-card";
+import { RadarVisual } from "@/components/home/radar-visual";
+import { UpdateFeed } from "@/components/home/update-feed";
 import { DataState } from "@/components/ui/data-state";
+import { DirectionCard } from "@/components/ui/direction-card";
 import { getCompanies } from "@/lib/data";
-import { isCohortEvidence } from "@/lib/domain";
+import { isCohortEvidence, isUsableLinkEvidence } from "@/lib/domain";
 
-function date(value: string | null | undefined) {
+const directionMeta = [
+  ["自动驾驶", "感知、规划、控制与算法", Bot],
+  ["嵌入式", "车载软件、控制器与通信", CircuitBoard],
+  ["三电", "电机、电控与动力系统", BatteryCharging],
+  ["底盘", "车辆动力学与底盘控制", Gauge],
+  ["整车研发", "整车集成、试验与开发", CarFront],
+  ["测试验证", "系统测试、标定与验证", Wrench],
+] as const;
+
+function formatDate(value: string | null | undefined) {
   return value
-    ? new Intl.DateTimeFormat("zh-CN", { timeZone: "UTC" }).format(new Date(value))
+    ? new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(value))
     : "待人工确认";
 }
 
 export default async function HomePage() {
   try {
     const companies = await getCompanies();
-    const active = companies.filter((company) =>
-      company.recruitments?.some(
-        (program) =>
-          program.targetYear === 2027 &&
-          program.status.includes("开放") &&
-          program.sourceLink &&
-          isCohortEvidence(program.sourceLink, 2027),
-      ),
-    );
+    const active = companies.flatMap((company) => {
+      const program = company.recruitments?.find(
+        (item) =>
+          item.targetYear === 2027 &&
+          item.status.includes("开放") &&
+          item.sourceLink &&
+          isCohortEvidence(item.sourceLink, 2027),
+      );
+      return program ? [{ company, program }] : [];
+    });
     const updates = companies
       .filter((company) => company.changeSummary)
       .sort((a, b) => Date.parse(b.lastUpdatedAt) - Date.parse(a.lastUpdatedAt))
       .slice(0, 5);
+    const usableOfficialLinks = companies.filter((company) =>
+      company.links?.some((link) => link.isPrimary && isUsableLinkEvidence(link)),
+    ).length;
+    const latestUpdate = updates[0];
 
     return (
       <>
-        <section className="terminal-hero">
-          <div className="shell terminal-hero-grid">
-            <div className="hero-copy">
-              <p className="hero-cohort">2027届</p>
-              <h1>车辆行业校招情报</h1>
-              <p className="hero-lead">
-                官方入口、招聘批次与核验证据。先判断链接是什么、是否有效、何时核验，再决定下一步。
+        <section className="home-hero">
+          <div className="shell home-hero-grid">
+            <div className="home-hero-copy">
+              <p className="page-kicker">2027 届车辆行业校招</p>
+              <h1>更快找到适合你的车企机会</h1>
+              <p>
+                聚合车企、新势力、自动驾驶、三电与零部件企业的官方入口、招聘进度和技术方向，帮你少翻群聊，多做准备。
               </p>
-              <div className="hero-actions">
-                <Link className="button button-primary" href="#company-search">
-                  开始搜索
-                  <ArrowRight size={16} />
-                </Link>
-                <Link className="button button-secondary" href="/about">
-                  了解核验规则
-                </Link>
+              <form className="global-search" action="/companies">
+                <Search size={20} aria-hidden="true" />
+                <input
+                  type="search"
+                  name="q"
+                  aria-label="搜索公司、技术方向或城市"
+                  placeholder="搜索公司、技术方向或城市"
+                />
+                <button type="submit">
+                  搜索机会
+                  <ArrowRight size={17} />
+                </button>
+              </form>
+              <div className="quick-links" aria-label="热门技术方向">
+                <span>热门方向</span>
+                {["自动驾驶", "嵌入式", "三电", "底盘", "热管理"].map((direction) => (
+                  <Link
+                    href={`/companies?direction=${encodeURIComponent(direction)}`}
+                    key={direction}
+                  >
+                    {direction}
+                  </Link>
+                ))}
               </div>
             </div>
-            <aside className="signal-panel" aria-label="平台数据快照">
-              <span className="signal-line">
-                <i />
-                LINK EVIDENCE · 2026-06-11
-              </span>
-              <div className="signal-metrics">
-                <p>
-                  <strong>{companies.length}</strong>
-                  <span>跟踪企业</span>
-                </p>
-                <p>
-                  <strong>{active.length}</strong>
-                  <span>明确 2027 机会</span>
-                </p>
-              </div>
-              <small>通用招聘官网不会被计入 2027 届开放项目。</small>
-            </aside>
+            {latestUpdate ? (
+              <RadarVisual
+                company={latestUpdate.shortName}
+                summary={latestUpdate.changeSummary ?? "信息已更新"}
+              />
+            ) : null}
           </div>
         </section>
 
-        <section className="shell page-section search-first" id="company-search">
-          <div className="section-heading">
+        <section className="shell metric-strip" aria-label="平台数据概览">
+          <article>
+            <strong>{companies.length}</strong>
+            <span>已收录企业</span>
+          </article>
+          <article>
+            <strong>{usableOfficialLinks}</strong>
+            <span>可用招聘入口</span>
+          </article>
+          <article>
+            <strong>{active.length}</strong>
+            <span>明确 2027 项目</span>
+          </article>
+          <article>
+            <strong>{formatDate(latestUpdate?.lastUpdatedAt)}</strong>
+            <span>最近数据更新</span>
+          </article>
+        </section>
+
+        <section className="shell section-block">
+          <div className="section-title">
             <div>
-              <p className="eyebrow">SEARCH FIRST</p>
-              <h2>先找公司，再看证据</h2>
+              <p className="page-kicker">正在招聘</p>
+              <h2>现在值得关注的机会</h2>
+              <p>只展示页面明确面向 2027 届、且官方入口仍可访问的项目。</p>
             </div>
-            <p>支持公司、城市和车辆方向搜索。首页只保留少量结果，完整比较进入公司库。</p>
+            <Link className="section-link" href="/companies">
+              查看全部企业
+              <ArrowRight size={17} />
+            </Link>
           </div>
-          <CompanyExplorer companies={companies} limit={6} mobileLimit={3} />
-        </section>
-
-        <section className="shell page-section">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">OPEN NOW</p>
-              <h2>当前明确开放的 2027 项目</h2>
-            </div>
-            <p>仅包含可访问的官方页面，且页面正文明确提到 2027 届。</p>
-          </div>
-          <div className="opportunity-list">
-            {active.map((company) => {
-              const program = company.recruitments?.find((item) => item.targetYear === 2027);
-              return (
-                <article className="opportunity-row" key={company.id}>
-                  <div>
-                    <span>{company.type}</span>
-                    <h3>
-                      <a href={`/companies/${company.slug}`}>{company.name}</a>
-                    </h3>
-                  </div>
-                  <p>
-                    {program?.title}
-                    <small>核验于 {date(program?.verifiedAt)} · 截止日期未公布</small>
-                  </p>
-                  <CompanyLinkAction companyName={company.name} link={program?.sourceLink} />
-                </article>
-              );
-            })}
+          <div className="opportunity-grid">
+            {active.slice(0, 3).map(({ company, program }) => (
+              <OpportunityCard company={company} program={program} key={company.id} />
+            ))}
           </div>
         </section>
 
-        <section className="shell page-section intelligence-grid">
+        <section className="shell section-block insight-grid">
           <div>
-            <div className="section-heading compact-heading">
+            <div className="section-title section-title-compact">
               <div>
-                <p className="eyebrow">RECENT CHANGES</p>
-                <h2>最近核验变化</h2>
+                <p className="page-kicker">最近变化</p>
+                <h2>信息更新，不让你错过变化</h2>
               </div>
             </div>
-            <div className="update-list">
-              {updates.map((company) => (
-                <a
-                  href={`/companies/${company.slug}`}
-                  className="update-row"
-                  data-testid="latest-update"
-                  key={company.id}
-                >
-                  <span>{company.shortName}</span>
-                  <strong>{company.changeSummary}</strong>
-                  <small>{date(company.lastUpdatedAt)}</small>
-                </a>
-              ))}
-            </div>
+            <UpdateFeed companies={updates} />
           </div>
-          <aside className="method-panel">
-            <ShieldCheck size={21} />
-            <p className="eyebrow">READ BEFORE APPLY</p>
-            <h2>链接先解释，按钮后出现</h2>
+          <aside className="starter-card">
+            <span className="starter-icon">
+              <CheckCircle2 size={22} />
+            </span>
+            <p className="page-kicker">第一次来？</p>
+            <h2>用三步建立你的校招清单</h2>
             <ol>
               <li>
-                <SearchCheck size={15} />
-                先看来源类型、官方域名和面向届次。
+                <strong>01</strong>
+                按方向筛出适合的企业
               </li>
               <li>
-                <Clock3 size={15} />
-                再看健康状态与最后核验时间。
+                <strong>02</strong>
+                查看当前项目和官方入口
               </li>
               <li>
-                <ShieldCheck size={15} />
-                失效或受限链接不会伪装成正常主按钮。
+                <strong>03</strong>
+                用求职指南准备简历和面试
               </li>
             </ol>
-            <Link href="/about">
-              查看完整证据规则
-              <ArrowRight size={15} />
+            <Link href="/resources">
+              开始准备
+              <ArrowRight size={16} />
             </Link>
           </aside>
+        </section>
+
+        <section className="shell section-block">
+          <div className="section-title">
+            <div>
+              <p className="page-kicker">技术方向</p>
+              <h2>按车辆技术方向找机会</h2>
+              <p>从你熟悉的专业和技能出发，快速缩小企业范围。</p>
+            </div>
+          </div>
+          <div className="direction-grid">
+            {directionMeta.map(([title, description, icon]) => (
+              <DirectionCard
+                count={
+                  companies.filter((company) => company.vehicleDirections.includes(title)).length
+                }
+                description={description}
+                icon={icon}
+                key={title}
+                title={title}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className="shell verification-callout">
+          <span className="verification-icon">
+            <ShieldCheck size={24} />
+          </span>
+          <div>
+            <p className="page-kicker">信息原则</p>
+            <h2>每条机会，都说明信息从哪里来</h2>
+            <p>
+              我们区分具体校招项目、校园招聘门户和通用招聘官网；没有可靠日期就不显示精确日期，没有有效入口就明确标记待补充。
+            </p>
+          </div>
+          <Link href="/about">
+            了解我们的核验方式
+            <ArrowRight size={17} />
+          </Link>
         </section>
       </>
     );

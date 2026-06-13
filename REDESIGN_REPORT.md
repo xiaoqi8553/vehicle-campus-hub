@@ -1,5 +1,82 @@
 # Vehicle Campus Hub 产品级重构报告
 
+## 2026-06-13 公众官网重塑
+
+### 目标与方向
+
+本轮采用方向 A“清爽科技求职平台”，将工程台账式界面重塑为公众品牌 **车招雷达**。核心原则是“机会优先，证据托底”：学生先看懂哪里能投、适合什么、下一步做什么，再查看来源类型、链接状态和最后核验时间。
+
+完整设计规格：
+
+- `docs/superpowers/specs/2026-06-13-public-website-redesign-design.md`
+- `docs/superpowers/plans/2026-06-13-public-website-redesign.md`
+
+### 信息架构变化
+
+| 页面              | 新职责                                 |
+| ----------------- | -------------------------------------- |
+| `/`               | 搜索、明确机会、最近变化和技术方向发现 |
+| `/companies`      | 企业筛选、排序和机会比较               |
+| `/companies/[id]` | 当前机会、技术方向、来源和下一步判断   |
+| `/calendar`       | 可靠日期节点、无截止项目和观察名单     |
+| `/resources`      | 路线图、主题指南和完整文章             |
+| `/about`          | 公众使命、信息规则、反馈和免责声明     |
+
+公开页面已删除 `VCH`、`SEARCH FIRST`、`EVIDENCE DOSSIER`、`DECISION SUMMARY`、`公司情报库` 和 `证据档案` 等内部表达。
+
+### 视觉系统
+
+- 品牌：车招雷达 / Vehicle Campus Hub。
+- 主色：电动蓝 `#215EE8`，配合深蓝、浅蓝背景、绿色开放状态和橙色待确认状态。
+- 字体：系统现代中文字体栈，正文 16px，公众页面标题 34–60px。
+- 组件：圆角卡片、轻量阴影、44px 交互热区、清楚焦点状态和 reduced-motion 支持。
+- 移动端：首页只展示 3 个明确机会；公司、详情、日历、指南和关于页全部单列重排。
+
+### 关键修复
+
+1. 修复多个页面源码中的乱码文案。
+2. 首页不再渲染公司库缩略版，改为 3 个明确机会和 5 条真实变化。
+3. 公司库每家企业只有一个外部主操作和一个内部详情入口。
+4. 公司详情删除内部审计语言和无法解释的精确分数。
+5. 日历不再渲染 22 条重复观察记录，也不显示未核验精确日期。
+6. 求职指南将“平台整理”明确标注为内容来源，并保留 6 篇完整正文。
+7. 关于页只保留一个反馈主操作，并明确提交所需信息。
+8. 公司详情入口改用稳定的原生同站导航，修复 Chromium 偶发不跳转。
+
+### 本轮截图
+
+![首页桌面](docs/redesign/2026-06-13/home-desktop.png)
+
+![首页移动端](docs/redesign/2026-06-13/home-mobile.png)
+
+![公司库桌面](docs/redesign/2026-06-13/companies-desktop.png)
+
+![公司详情移动端](docs/redesign/2026-06-13/company-detail-mobile.png)
+
+![招聘日历桌面](docs/redesign/2026-06-13/calendar-desktop.png)
+
+![求职指南移动端](docs/redesign/2026-06-13/resources-mobile.png)
+
+![关于页桌面](docs/redesign/2026-06-13/about-desktop.png)
+
+### 数据边界
+
+- 企业仍为现有 25 家，没有为丰富页面新增虚构公司。
+- 明确 2027 届官方项目仍为 3 家。
+- 22 家企业仍需补充明确的 2027 届项目证据。
+- 5 家企业仍需人工复核或补充可用主入口。
+- 未新增虚构招聘时间、岗位或官方链接。
+
+### 自动验证
+
+- Unit：14/14。
+- Playwright：66 passed / 2 intentional skipped。
+- Desktop 1440、iPad、iPhone 14、iPhone SE：无横向滚动。
+- 无 `example.com`、空 `href`、严重 console error、hydration error 或关键请求失败。
+- ESLint、TypeScript、UTF-8、Prettier 和 production build 通过。
+
+---
+
 日期：2026-06-11
 目标：提升链接可理解性、信息架构与真实使用效率。
 

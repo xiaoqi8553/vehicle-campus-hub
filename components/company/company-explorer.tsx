@@ -119,14 +119,14 @@ export function CompanyExplorer({
   const fullListHref = params.size ? `/companies?${params}` : "/companies";
 
   return (
-    <div className="explorer" data-testid="company-explorer">
-      <div className="filter-panel">
+    <div className="company-explorer" data-testid="company-explorer">
+      <div className="company-filter-panel">
         <label className="search-field">
           <Search size={18} />
           <input
             type="search"
-            aria-label="搜索公司、城市或车辆方向"
-            placeholder="搜索公司、城市或车辆方向"
+            aria-label="搜索公司、技术方向或城市"
+            placeholder="搜索公司、技术方向或城市"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -181,11 +181,11 @@ export function CompanyExplorer({
         </div>
         <button
           aria-expanded={advancedOpen}
-          className="advanced-toggle"
+          className="more-filter-button"
           type="button"
           onClick={() => setAdvancedOpen((value) => !value)}
         >
-          {advancedOpen ? "收起高级筛选" : "高级筛选"}
+          {advancedOpen ? "收起更多筛选" : "更多筛选"}
         </button>
         {advancedOpen && (
           <div className="advanced-filter-grid">
@@ -230,10 +230,10 @@ export function CompanyExplorer({
           </div>
         )}
       </div>
-      <div className="result-bar">
+      <div className="company-result-bar">
         <span>
           <SlidersHorizontal size={16} />
-          匹配 {filtered.length} 家企业
+          找到 {filtered.length} 家企业
         </span>
         {(query || category || status || direction || city || hasOfficialLink) && (
           <button
@@ -251,7 +251,7 @@ export function CompanyExplorer({
           </button>
         )}
       </div>
-      <div className="company-list">
+      <div className="public-company-list">
         {visible.map((company) => (
           <CompanyCard key={company.id} company={company} />
         ))}

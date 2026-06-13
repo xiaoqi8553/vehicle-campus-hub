@@ -1,10 +1,10 @@
-# Vehicle Campus Hub
+# 车招雷达
 
-面向车辆工程、机械工程、自动化、控制、嵌入式、自动驾驶、三电、电池、热管理与智能座舱方向学生的 **2027 届车辆行业校招情报平台**。
+Vehicle Campus Hub 的公众品牌是 **车招雷达**：面向车辆工程、机械工程、自动化、控制、嵌入式、自动驾驶、三电、电池、热管理与智能座舱方向学生的 **2027 届车辆行业校招信息平台**。
 
 [在线访问](https://vehicle-campus-hub.vercel.app) · [工程治理](./PROJECT_GOVERNANCE.md) · [发布规范](./RELEASE.md) · [回退手册](./ROLLBACK.md) · [测试报告](./TEST_REPORT.md)
 
-![Vehicle Campus Hub 首页](./docs/redesign/2026-06-11/after-home-chromium.png)
+![车招雷达首页](./docs/redesign/2026-06-13/home-desktop.png)
 
 ## 核心能力
 
@@ -14,6 +14,7 @@
 - 未核验日期、失效入口和通用招聘门户不会被包装成 2027 届开放项目。
 - 提供车辆方向求职资料、校招日历和数据纠错入口。
 - 支持 Desktop、iPad、iPhone 14 和 iPhone SE。
+- 公开页面统一使用面向学生的产品语言，不暴露后台或内部审计术语。
 
 ## 技术栈
 
@@ -82,6 +83,8 @@ npm run db:verify
 ```text
 app/                         Next.js 页面与 API
 components/                  页面组件
+components/brand/            公众品牌组件
+components/home/             首页机会与更新组件
 lib/                         数据序列化、规则与 Prisma 客户端
 prisma/                      PostgreSQL schema、迁移与 seed
 prisma/migrations-sqlite-archive/
@@ -90,6 +93,7 @@ scripts/                     数据迁移、校验、备份与生产检查
 tests/                       Vitest 与 Playwright
 .github/workflows/           CI、发布、安全和定期巡检
 docs/adr/                    架构决策记录
+docs/redesign/               每轮视觉迭代截图
 ```
 
 ## 健康检查

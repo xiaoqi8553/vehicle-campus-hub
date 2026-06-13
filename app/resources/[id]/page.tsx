@@ -12,10 +12,10 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
     <div className="shell page-space resource-article-page">
       <Link className="back-link" href="/resources">
         <ArrowLeft size={16} />
-        返回资料库
+        返回求职指南
       </Link>
       <header className="resource-article-header">
-        <p className="eyebrow">{resource.type} / 平台整理 / 适用 2027 届</p>
+        <p className="page-kicker">{resource.type} · 平台整理 · 适用 2027 届</p>
         <h1>{resource.title}</h1>
         <p>{resource.summary}</p>
         <div className="tag-row">
@@ -39,7 +39,7 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
         <article className="resource-article">
           {resource.content.map((section, index) => (
             <section id={`section-${index + 1}`} key={section.heading}>
-              <p className="eyebrow">SECTION {String(index + 1).padStart(2, "0")}</p>
+              <p className="page-kicker">第 {String(index + 1).padStart(2, "0")} 章</p>
               <h2>{section.heading}</h2>
               {section.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>

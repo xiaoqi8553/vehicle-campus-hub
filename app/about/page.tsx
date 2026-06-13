@@ -1,121 +1,174 @@
-import { ArrowRight, CheckCircle2, ShieldAlert } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  Compass,
+  DatabaseZap,
+  HeartHandshake,
+  MessageSquareText,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 const FEEDBACK_URL =
   "https://github.com/xiaoqi8553/vehicle-campus-hub/issues/new?template=data-correction.md";
 
+const principles = [
+  {
+    icon: Compass,
+    title: "我们整理什么",
+    copy: "企业招聘入口、具体校招项目、招聘时间、技术方向与求职准备资料。",
+  },
+  {
+    icon: ShieldCheck,
+    title: "我们如何判断",
+    copy: "区分具体项目与通用招聘站，记录来源、届次、链接状态和最后核验时间。",
+  },
+  {
+    icon: DatabaseZap,
+    title: "我们不会做什么",
+    copy: "不编造招聘日期、岗位和官方链接，也不把待确认信息包装成确定事实。",
+  },
+];
+
 const audience = [
   "车辆工程",
   "机械工程",
-  "自动化",
-  "控制",
-  "嵌入式",
+  "自动化与控制",
   "自动驾驶",
-  "三电",
-  "电池",
+  "嵌入式与车载软件",
+  "三电与电池",
   "热管理",
   "智能座舱",
 ];
 
-const credibilityRules = [
-  { title: "官方", copy: "企业招聘站、官网、官方公众号或可核验官方入口。" },
-  { title: "较可信", copy: "学校就业网、企业公开页面或多渠道一致的公开整理。" },
-  { title: "经验参考", copy: "候选人复盘和面经，只用于准备方向，不代表企业题库。" },
-  { title: "待核实", copy: "缺少来源链接、投递入口或核验时间，页面会明确显示待补充。" },
-];
-
 export default function AboutPage() {
   return (
-    <div className="shell page-space about-page">
-      <div className="page-heading">
-        <p className="eyebrow">ABOUT VEHICLE CAMPUS HUB</p>
-        <h1>关于 Vehicle Campus Hub</h1>
-        <p>
-          Vehicle Campus Hub 是面向 2027
-          届车辆行业求职学生的信息聚合平台，优先整理官方投递入口、校招时间线、岗位方向、来源可信度和笔试面经准备资料。
-        </p>
-      </div>
+    <div className="shell page-space about-public-page">
+      <PageHero
+        eyebrow="关于车招雷达"
+        title="让车辆行业校招信息，更容易找到，也更容易相信"
+        description="车招雷达面向 2027 届车辆方向学生，整理分散在企业招聘站、官方公告和公开页面中的信息，帮助你更快判断现在能做什么。"
+        aside={
+          <div className="about-hero-mark" aria-hidden="true">
+            <Sparkles size={24} />
+          </div>
+        }
+      />
 
-      <section className="about-card-grid">
-        <article className="about-card">
-          <CheckCircle2 size={22} />
-          <h2>项目定位</h2>
+      <section className="about-principle-grid">
+        {principles.map(({ icon: Icon, title, copy }) => (
+          <article key={title}>
+            <span>
+              <Icon size={22} />
+            </span>
+            <h2>{title}</h2>
+            <p>{copy}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="about-story-grid">
+        <div className="about-story-copy">
+          <p className="page-kicker">为谁服务</p>
+          <h2>给正在寻找车辆行业方向的你</h2>
           <p>
-            聚合车企、新势力、自动驾驶、三电、电池、热管理、零部件和智能化供应商的校园招聘信息，帮助学生判断“能不能投、什么时候投、适合投什么方向”。
+            我们关注整车、新势力、自动驾驶、三电、电池、热管理、零部件与智能化供应商，优先帮助专业方向明确、但信息渠道分散的学生建立自己的企业清单。
           </p>
-        </article>
-        <article className="about-card">
-          <CheckCircle2 size={22} />
-          <h2>面向人群</h2>
-          <p>
-            适合车辆工程、机械工程、自动化、控制、嵌入式、自动驾驶、三电、电池、热管理和智能座舱方向的本科、硕士和博士应届生。
-          </p>
-          <div className="tag-row">
+          <div className="about-audience-list">
             {audience.map((item) => (
-              <span className="tag" key={item}>
+              <span key={item}>
+                <CheckCircle2 size={15} />
                 {item}
               </span>
             ))}
           </div>
-        </article>
+        </div>
+        <aside className="about-belief-card">
+          <HeartHandshake size={27} />
+          <blockquote>
+            “可靠”不等于把页面做成审计报告。用户应该先看懂机会，再自然地看到来源和核验时间。
+          </blockquote>
+          <p>这是车招雷达所有页面共同遵循的产品原则。</p>
+        </aside>
       </section>
 
-      <section className="detail-section">
-        <div className="detail-section-title">
-          <ShieldAlert size={20} />
-          <h2>信息来源与可信度规则</h2>
+      <section className="about-rules-section">
+        <div className="section-title">
+          <div>
+            <p className="page-kicker">信息规则</p>
+            <h2>一条信息如何进入车招雷达</h2>
+            <p>我们按用途和证据强度表达信息，不让一个通用招聘首页变成“2027 届已开放”的证明。</p>
+          </div>
         </div>
-        <div className="credibility-grid">
-          {credibilityRules.map((rule) => (
-            <article key={rule.title}>
-              <strong>{rule.title}</strong>
-              <p>{rule.copy}</p>
-            </article>
-          ))}
+        <div className="about-rule-list">
+          <article>
+            <strong>01</strong>
+            <div>
+              <h3>先判断链接是什么</h3>
+              <p>具体项目、校园招聘门户、通用招聘官网、官方公告和企业介绍页分开记录。</p>
+            </div>
+          </article>
+          <article>
+            <strong>02</strong>
+            <div>
+              <h3>再核对届次与状态</h3>
+              <p>只有页面明确提到 2027 届并且仍可访问，才会计入明确开放项目。</p>
+            </div>
+          </article>
+          <article>
+            <strong>03</strong>
+            <div>
+              <h3>最后说明核验时间</h3>
+              <p>招聘信息变化很快，用户需要知道最近何时检查过，而不是只看到一个按钮。</p>
+            </div>
+          </article>
         </div>
-        <p className="about-disclaimer">
-          平台不会把无来源信息标记为官方。若企业投递链接、截止时间或岗位城市发生变化，请以企业官方招聘站、官方公众号或学校就业网最终通知为准。
-        </p>
       </section>
 
-      <section className="detail-section" id="feedback">
-        <div className="detail-section-title">
-          <CheckCircle2 size={20} />
-          <h2>纠错反馈方式</h2>
+      <section className="about-feedback-section" id="feedback">
+        <div>
+          <p className="page-kicker">一起完善</p>
+          <h2>你发现的信息，可以帮助下一位同学</h2>
+          <p>
+            提交公司名、原链接、建议链接、变化说明和核验日期。公开反馈会留下处理记录，也方便后续复查。
+          </p>
+          <a href={FEEDBACK_URL} target="_blank" rel="noreferrer" aria-label="提交信息反馈">
+            <MessageSquareText size={17} />
+            提交信息反馈
+            <ArrowUpRight size={16} />
+          </a>
         </div>
-        <p>
-          发现届次、入口状态或证据摘要有误时，可直接打开预设 GitHub
-          Issue。请填写公司名、原链接、建议链接、证据摘要和核验日期。
-        </p>
-        <a
-          aria-label="打开 GitHub 提交数据纠错反馈"
-          href={FEEDBACK_URL}
-          className="button button-primary"
-          target="_blank"
-          rel="noreferrer"
-        >
-          提交纠错反馈
-          <ArrowRight size={15} />
-        </a>
+        <aside className="about-feedback-tips">
+          <strong>提交时请尽量包含</strong>
+          <ul>
+            <li>公司或项目名称</li>
+            <li>当前页面与正确链接</li>
+            <li>变化说明和核验日期</li>
+          </ul>
+        </aside>
       </section>
 
-      <section className="detail-section">
-        <div className="detail-section-title">
-          <CheckCircle2 size={20} />
-          <h2>后续计划</h2>
+      <section className="about-roadmap">
+        <p className="page-kicker">下一步</p>
+        <h2>从网站走向更连续的求职工具</h2>
+        <div>
+          <article>
+            <strong>微信小程序</strong>
+            <p>复用企业、项目、日历和指南数据，增加订阅提醒。</p>
+          </article>
+          <article>
+            <strong>移动 App</strong>
+            <p>增加收藏、截止提醒和个人投递进度。</p>
+          </article>
+          <article>
+            <strong>长期数据维护</strong>
+            <p>持续核验官方入口、归档变化并明确标记过期信息。</p>
+          </article>
         </div>
-        <div className="roadmap-list">
-          <p>
-            <strong>微信小程序：</strong>复用
-            Company、RecruitmentProgram、Job、Resource、CalendarEvent 数据结构，增加订阅提醒。
-          </p>
-          <p>
-            <strong>App：</strong>增加收藏、岗位匹配、截止提醒、投递进度和资料纠错队列。
-          </p>
-          <p>
-            <strong>数据运营：</strong>
-            补充更多官方入口、定时链接核验、过期提醒和学校就业网来源归档。
-          </p>
-        </div>
+        <small>
+          免责声明：招聘信息以企业官方页面和最终通知为准，平台内容仅用于信息整理与求职准备。
+        </small>
       </section>
     </div>
   );

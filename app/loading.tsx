@@ -3,7 +3,7 @@ export default function Loading() {
     <div className="shell page-space">
       <div className="loading-panel">
         <span />
-        <p>正在加载校招数据...</p>
+        <p>正在准备页面内容...</p>
       </div>
     </div>
   );
