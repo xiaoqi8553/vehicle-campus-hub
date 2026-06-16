@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.2.0](https://github.com/xiaoqi8553/vehicle-campus-hub/compare/v2.1.0...v2.2.0) (2026-06-16)
+
+
+### Features
+
+* establish governed releases and PostgreSQL production ([dfd522d](https://github.com/xiaoqi8553/vehicle-campus-hub/commit/dfd522dc5c14079c5c82067a8a1e59d176e6a932))
+* polish public product layout and logos ([12b7071](https://github.com/xiaoqi8553/vehicle-campus-hub/commit/12b70711daed0babb60ef3137dddf289ca48b5f4))
+* rebuild public site as CheZhao Radar ([#14](https://github.com/xiaoqi8553/vehicle-campus-hub/issues/14)) ([e176d10](https://github.com/xiaoqi8553/vehicle-campus-hub/commit/e176d10830e26831c976217082b5298ddfbfae86))
+
+
+### Bug Fixes
+
+* restore scheduled link audit ([264cecb](https://github.com/xiaoqi8553/vehicle-campus-hub/commit/264cecbbd5d1503ab6d8a8c21cc9c40e57a12a1c))
+* support prisma in vercel runtime ([#12](https://github.com/xiaoqi8553/vehicle-campus-hub/issues/12)) ([c39e2b2](https://github.com/xiaoqi8553/vehicle-campus-hub/commit/c39e2b2e038f3466a78558601bc8caa1e020a057))
+
 ## [Unreleased]
 
 ### Added
