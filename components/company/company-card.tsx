@@ -1,5 +1,6 @@
 import { ArrowRight, CalendarDays, MapPin, ShieldCheck } from "lucide-react";
 import { CompanyLinkAction } from "@/components/company/company-link";
+import { CompanyLogo } from "@/components/company/company-logo";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { CompanyCardData } from "@/lib/data";
 import {
@@ -32,7 +33,7 @@ export function CompanyCard({ company }: { company: CompanyCardData }) {
   return (
     <article className="company-list-item" data-testid="company-row">
       <div className="company-list-identity">
-        <span className="company-avatar">{company.shortName.slice(0, 1)}</span>
+        <CompanyLogo name={company.name} logo={company.logo} />
         <div>
           <span className="company-type">{company.type}</span>
           <h2>

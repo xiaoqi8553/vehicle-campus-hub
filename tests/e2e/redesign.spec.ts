@@ -4,11 +4,16 @@ test("homepage prioritizes search and keeps the mobile company list short", asyn
   page,
 }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByText("2027 届车辆行业校招", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "更快找到适合你的车企机会" })).toBeVisible();
+  await expect(page.getByText("2027 届", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "车辆行业 2027 届校招信息汇总" }),
+  ).toBeVisible();
   await expect(page.getByRole("searchbox", { name: "搜索公司、技术方向或城市" })).toBeVisible();
 
-  await expect(page.getByTestId("home-opportunity")).toHaveCount(3);
+  await expect(page.getByTestId("home-opportunity")).toHaveCount(6);
+  if (testInfo.project.name === "mobile") {
+    await expect(page.locator('[data-testid="home-opportunity"]:visible')).toHaveCount(5);
+  }
 
   const hero = await page.locator(".home-hero").evaluate((element) => {
     const heading = element.querySelector("h1");
@@ -20,11 +25,11 @@ test("homepage prioritizes search and keeps the mobile company list short", asyn
     };
   });
   if (testInfo.project.name === "mobile") {
-    expect(hero.fontSize).toBeGreaterThanOrEqual(28);
-    expect(hero.fontSize).toBeLessThanOrEqual(34);
+    expect(hero.fontSize).toBeGreaterThanOrEqual(32);
+    expect(hero.fontSize).toBeLessThanOrEqual(36);
   } else {
     expect(hero.height).toBeLessThanOrEqual(560);
-    expect(hero.fontSize).toBeGreaterThanOrEqual(42);
+    expect(hero.fontSize).toBeGreaterThanOrEqual(48);
     expect(hero.fontSize).toBeLessThanOrEqual(60);
   }
   expect(hero.headingHeight).toBeLessThanOrEqual(

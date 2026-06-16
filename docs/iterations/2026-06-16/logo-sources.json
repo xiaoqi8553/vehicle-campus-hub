@@ -1,0 +1,202 @@
+[
+  {
+    "id": "xiaomi-auto",
+    "company": "Xiaomi Auto",
+    "logoPath": "/company-logos/xiaomi-auto.ico",
+    "sourceUrl": "https://www.mi.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "li-auto",
+    "company": "Li Auto",
+    "logoPath": "/company-logos/li-auto.ico",
+    "sourceUrl": "https://www.lixiang.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "nio",
+    "company": "NIO",
+    "logoPath": "/company-logos/nio.svg",
+    "sourceUrl": "https://www.nio.cn/",
+    "status": "neutral-fallback",
+    "contentType": "image/svg+xml"
+  },
+  {
+    "id": "xpeng",
+    "company": "XPeng",
+    "logoPath": "/company-logos/xpeng.ico",
+    "sourceUrl": "https://www.xiaopeng.com/favicon.ico?favicon.dba88f4b.ico",
+    "status": "official-favicon",
+    "contentType": "image/vnd.microsoft.icon"
+  },
+  {
+    "id": "leapmotor",
+    "company": "Leapmotor",
+    "logoPath": "/company-logos/leapmotor.svg",
+    "sourceUrl": "https://www.leapmotor.com/",
+    "status": "neutral-fallback",
+    "contentType": "image/svg+xml"
+  },
+  {
+    "id": "zeekr",
+    "company": "Zeekr",
+    "logoPath": "/company-logos/zeekr.png",
+    "sourceUrl": "https://www.zeekrgroup.com/favicon.png",
+    "status": "official-favicon",
+    "contentType": "image/png"
+  },
+  {
+    "id": "tesla",
+    "company": "Tesla",
+    "logoPath": "/company-logos/tesla.ico",
+    "sourceUrl": "https://www.tesla.com/themes/custom/tesla_frontend/assets/favicons/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/vnd.microsoft.icon"
+  },
+  {
+    "id": "byd",
+    "company": "BYD",
+    "logoPath": "/company-logos/byd.svg",
+    "sourceUrl": "https://www.bydglobal.com/cn/",
+    "status": "neutral-fallback",
+    "contentType": "image/svg+xml"
+  },
+  {
+    "id": "geely",
+    "company": "Geely",
+    "logoPath": "/company-logos/geely.ico",
+    "sourceUrl": "https://www.geely.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "changan",
+    "company": "Changan",
+    "logoPath": "/company-logos/changan.ico",
+    "sourceUrl": "https://www.changan.com.cn/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "gac",
+    "company": "GAC",
+    "logoPath": "/company-logos/gac.webp",
+    "sourceUrl": "https://br-www-resouce-cdn.gacgroup.com/static/Global/tenant/cms/common/202503/60ff2381-aa68-418e-8634-d1d47b19d8cb.webp",
+    "status": "official-favicon",
+    "contentType": "application/octet-stream"
+  },
+  {
+    "id": "saic",
+    "company": "SAIC",
+    "logoPath": "/company-logos/saic.ico",
+    "sourceUrl": "https://www.saicmotor.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "faw",
+    "company": "FAW",
+    "logoPath": "/company-logos/faw.svg",
+    "sourceUrl": "https://www.faw.com.cn/",
+    "status": "neutral-fallback",
+    "contentType": "image/svg+xml"
+  },
+  {
+    "id": "dongfeng",
+    "company": "Dongfeng",
+    "logoPath": "/company-logos/dongfeng.ico",
+    "sourceUrl": "https://www.dfmc.com.cn/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "great-wall",
+    "company": "GWM",
+    "logoPath": "/company-logos/great-wall.ico",
+    "sourceUrl": "https://www.gwm.com.cn/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "catl",
+    "company": "CATL",
+    "logoPath": "/company-logos/catl.ico",
+    "sourceUrl": "https://www.catl.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "calb",
+    "company": "CALB",
+    "logoPath": "/company-logos/calb.ico",
+    "sourceUrl": "https://www.calb-tech.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "bosch",
+    "company": "Bosch",
+    "logoPath": "/company-logos/bosch.ico",
+    "sourceUrl": "https://www.bosch.com.cn/media/tech/tech_images/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "continental",
+    "company": "Continental",
+    "logoPath": "/company-logos/continental.ico",
+    "sourceUrl": "https://www.continental.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "zf",
+    "company": "ZF",
+    "logoPath": "/company-logos/zf.png",
+    "sourceUrl": "https://www.zf.com/master/media/toolbox/assets/img/zf_logo_blue_3c.png",
+    "status": "official-favicon",
+    "contentType": "image/png"
+  },
+  {
+    "id": "denso",
+    "company": "Denso",
+    "logoPath": "/company-logos/denso.svg",
+    "sourceUrl": "https://www.denso.com/cn/zh/",
+    "status": "neutral-fallback",
+    "contentType": "image/svg+xml"
+  },
+  {
+    "id": "horizon",
+    "company": "Horizon Robotics",
+    "logoPath": "/company-logos/horizon.ico",
+    "sourceUrl": "https://www.horizon.auto/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "momenta",
+    "company": "Momenta",
+    "logoPath": "/company-logos/momenta.ico",
+    "sourceUrl": "https://www.momenta.cn/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "jingwei-hirain",
+    "company": "Hirain",
+    "logoPath": "/company-logos/jingwei-hirain.ico",
+    "sourceUrl": "https://www.hirain.com/favicon.ico",
+    "status": "official-favicon",
+    "contentType": "image/x-icon"
+  },
+  {
+    "id": "hesai",
+    "company": "Hesai",
+    "logoPath": "/company-logos/hesai.svg",
+    "sourceUrl": "https://www.hesaitech.com/cn/",
+    "status": "neutral-fallback",
+    "contentType": "image/svg+xml"
+  }
+]

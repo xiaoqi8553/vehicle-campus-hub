@@ -13,6 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { CompanyLinkAction, LinkEvidenceRow } from "@/components/company/company-link";
+import { CompanyLogo } from "@/components/company/company-logo";
 import { FeedbackCallout } from "@/components/ui/feedback-callout";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getCompanyDetail } from "@/lib/data";
@@ -57,9 +58,7 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
 
       <header className="company-detail-hero">
         <div className="company-detail-brand">
-          <span className="company-avatar company-avatar-large">
-            {company.shortName.slice(0, 1)}
-          </span>
+          <CompanyLogo name={company.name} logo={company.logo} size="lg" />
           <div>
             <p className="page-kicker">{company.type}</p>
             <h1>{company.name}</h1>

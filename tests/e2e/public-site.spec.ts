@@ -6,7 +6,9 @@ test("public site uses the CheZhao Radar brand and student-facing navigation", a
   await page.goto("/");
 
   await expect(page.getByRole("link", { name: "车招雷达首页" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "更快找到适合你的车企机会" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "车辆行业 2027 届校招信息汇总" }),
+  ).toBeVisible();
   if (testInfo.project.name === "mobile") {
     await page.locator('summary[aria-label="打开导航"]').click();
   }
@@ -19,14 +21,20 @@ test("public site uses the CheZhao Radar brand and student-facing navigation", a
   await expect(page.getByText(/EVIDENCE DOSSIER|SEARCH FIRST|DECISION SUMMARY/)).toHaveCount(0);
 });
 
-test("homepage prioritizes search, three real opportunities and direction discovery", async ({
+test("homepage prioritizes search, verified opportunities and compact direction shortcuts", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(page.getByRole("searchbox", { name: "搜索公司、技术方向或城市" })).toBeVisible();
-  await expect(page.getByTestId("home-opportunity")).toHaveCount(3);
-  await expect(page.getByRole("heading", { name: "按车辆技术方向找机会" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "每条机会，都说明信息从哪里来" })).toBeVisible();
+  await expect(page.getByTestId("home-opportunity")).toHaveCount(6);
+  await expect(page.getByRole("link", { name: "自动驾驶" })).toHaveAttribute(
+    "href",
+    "/companies?direction=%E8%87%AA%E5%8A%A8%E9%A9%BE%E9%A9%B6",
+  );
+  await expect(page.getByRole("heading", { name: "按车辆技术方向找机会" })).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "每条招聘入口都保留来源和核验时间" }),
+  ).toBeVisible();
 });
 
 test("company list communicates opportunity status without internal evidence jargon", async ({
@@ -85,7 +93,7 @@ test("about page explains the public mission and offers a real feedback action",
 
 test("each public page has a distinct student-facing purpose", async ({ page }) => {
   const routes = [
-    ["/companies", "寻找适合你的车辆企业"],
+    ["/companies", "车辆行业 2027 届公司机会库"],
     ["/calendar", "车辆行业校招日历"],
     ["/resources", "车辆行业求职指南"],
     ["/about", "让车辆行业校招信息，更容易找到，也更容易相信"],

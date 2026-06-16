@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin, ShieldCheck } from "lucide-react";
 import { CompanyLinkAction } from "@/components/company/company-link";
+import { CompanyLogo } from "@/components/company/company-logo";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { CompanyCardData, CompanyLinkData, RecruitmentData } from "@/lib/data";
+import { isCohortEvidence, isUsableLinkEvidence, linkSourceTypeLabel } from "@/lib/domain";
 
 function formatDate(value: string | null | undefined) {
   return value
@@ -17,15 +19,32 @@ function formatDate(value: string | null | undefined) {
 export function OpportunityCard({
   company,
   program,
+  variant = "verified",
 }: {
   company: CompanyCardData;
-  program: RecruitmentData & { sourceLink?: CompanyLinkData | null };
+  program?: (RecruitmentData & { sourceLink?: CompanyLinkData | null }) | null;
+  variant?: "open" | "verified" | "watch";
 }) {
+  const links = company.links ?? [];
+  const primaryLink =
+    program?.sourceLink ??
+    links.find((link) => link.isPrimary && isUsableLinkEvidence(link)) ??
+    links.find((link) => isUsableLinkEvidence(link));
+  const hasCohortProject = primaryLink ? isCohortEvidence(primaryLink, 2027) : false;
+  const status =
+    variant === "open" && hasCohortProject
+      ? "正在招聘"
+      : variant === "verified"
+        ? "入口已核验"
+        : "等待 2027 项目";
+  const opportunityTitle =
+    program?.title ?? (variant === "verified" ? "官方招聘入口已核验" : "关注后续校园招聘发布");
+
   return (
-    <article className="opportunity-card" data-testid="home-opportunity">
+    <article className={`opportunity-card opportunity-${variant}`} data-testid="home-opportunity">
       <div className="opportunity-card-top">
-        <span className="company-avatar">{company.shortName.slice(0, 1)}</span>
-        <StatusBadge status="正在招聘" />
+        <CompanyLogo name={company.name} logo={company.logo} />
+        <StatusBadge status={status} />
       </div>
       <div>
         <h3>{company.name}</h3>
@@ -37,19 +56,22 @@ export function OpportunityCard({
           </span>
         </p>
       </div>
-      <strong className="opportunity-title">{program.title}</strong>
+      <strong className="opportunity-title">{opportunityTitle}</strong>
+      <p className="opportunity-source">
+        <ShieldCheck size={15} />
+        {primaryLink ? linkSourceTypeLabel(primaryLink.sourceType) : "入口待补充"}
+      </p>
       <div className="chip-list">
         {company.vehicleDirections.slice(0, 3).map((direction) => (
           <span key={direction}>{direction}</span>
         ))}
       </div>
       <div className="opportunity-card-footer">
-        <CompanyLinkAction
-          companyName={company.name}
-          link={program.sourceLink}
-          className="text-link"
-        />
-        <small>{formatDate(program.verifiedAt)} 核验</small>
+        <CompanyLinkAction companyName={company.name} link={primaryLink} className="text-link" />
+        <small>
+          <CalendarDays size={14} />
+          {formatDate(primaryLink?.verifiedAt ?? program?.verifiedAt)} 核验
+        </small>
       </div>
       <Link className="card-cover-link" href={`/companies/${company.slug}`}>
         <span className="sr-only">了解{company.name}机会</span>

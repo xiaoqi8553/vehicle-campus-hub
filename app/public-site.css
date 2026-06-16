@@ -36,7 +36,7 @@ body {
     "Segoe UI",
     "Microsoft YaHei",
     sans-serif;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.65;
 }
 
@@ -49,7 +49,7 @@ main {
 }
 
 .shell {
-  width: min(1180px, calc(100% - 48px));
+  width: min(1300px, calc(100% - 56px));
 }
 
 .skip-link {
@@ -265,7 +265,7 @@ main {
 
 .home-hero-grid {
   position: relative;
-  min-height: 500px;
+  min-height: 480px;
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.55fr);
   align-items: center;
@@ -274,9 +274,9 @@ main {
 }
 
 .home-hero-copy h1 {
-  max-width: 760px;
+  max-width: 900px;
   margin: 0;
-  font-size: clamp(42px, 4vw, 52px);
+  font-size: clamp(48px, 4vw, 56px);
   line-height: 1.08;
   letter-spacing: -0.055em;
 }
@@ -336,7 +336,7 @@ main {
   border: 0;
   border-radius: 12px;
   background: var(--color-primary);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   transition:
     transform 160ms ease,
@@ -374,7 +374,7 @@ main {
   gap: 8px;
   margin-top: 18px;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .quick-links > span {
@@ -580,7 +580,7 @@ main {
 .opportunity-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
 .opportunity-card {
@@ -635,9 +635,49 @@ main {
   font-size: 14px;
 }
 
+.company-logo-frame {
+  width: 52px;
+  height: 52px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid #dce5fa;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(32, 60, 112, 0.06);
+}
+
+.company-logo-sm {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+}
+
+.company-logo-lg {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+}
+
+.company-logo {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+}
+
+.company-logo-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #42608a;
+  background: linear-gradient(145deg, #f3f7ff, #e8eef8);
+}
+
 .opportunity-card h3 {
   margin: 0;
-  font-size: 22px;
+  font-size: 23px;
   line-height: 1.25;
 }
 
@@ -647,7 +687,7 @@ main {
   gap: 8px 12px;
   margin: 7px 0 0;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .company-meta span {
@@ -658,8 +698,23 @@ main {
 
 .opportunity-title {
   min-height: 50px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.55;
+}
+
+.opportunity-source {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -6px 0 0;
+  color: #526079;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.opportunity-source svg {
+  color: var(--color-primary);
 }
 
 .chip-list,
@@ -677,7 +732,7 @@ main {
   border: 1px solid #e2e8f4;
   border-radius: 999px;
   background: #f8faff;
-  font-size: 12px;
+  font-size: 13px;
   font-style: normal;
 }
 
@@ -697,8 +752,11 @@ main {
 }
 
 .opportunity-card-footer small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .card-cover-link {
@@ -984,6 +1042,31 @@ main {
   box-shadow: 0 1px 0 rgba(22, 48, 90, 0.03);
 }
 
+.company-filter-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.company-filter-summary span {
+  min-height: 58px;
+  display: grid;
+  align-content: center;
+  padding: 10px 14px;
+  color: var(--color-muted);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: #fbfcff;
+  font-size: 14px;
+}
+
+.company-filter-summary strong {
+  color: var(--color-ink);
+  font-size: 20px;
+  line-height: 1.1;
+}
+
 .search-field {
   min-height: 52px;
   display: flex;
@@ -1019,6 +1102,52 @@ main {
   margin-top: 14px;
 }
 
+.direction-quick-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #e0e7f3;
+  border-radius: 14px;
+  background: #fbfdff;
+}
+
+.direction-quick-filter > span {
+  margin-right: 4px;
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.direction-quick-filter button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  color: #526079;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 760;
+}
+
+.direction-quick-filter button.active,
+.direction-quick-filter button:hover {
+  color: var(--color-primary);
+  border-color: #b7c9f6;
+  background: var(--color-primary-soft);
+}
+
+.direction-quick-filter small {
+  color: inherit;
+  opacity: 0.72;
+  font-size: 12px;
+}
+
 .filter-grid label,
 .advanced-filter-grid label,
 .resource-filter-grid label:not(.search-field) {
@@ -1031,7 +1160,7 @@ main {
 .advanced-filter-grid label > span,
 .resource-filter-grid label > span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -1085,7 +1214,7 @@ main {
 
 .company-result-bar span {
   color: var(--color-muted);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .company-result-bar button {
@@ -1104,7 +1233,7 @@ main {
 .company-list-item {
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(220px, 1.05fr) minmax(260px, 1.15fr) minmax(210px, 0.9fr) 190px;
+  grid-template-columns: minmax(240px, 1.05fr) minmax(300px, 1.2fr) minmax(230px, 0.9fr) 210px;
   align-items: center;
   gap: 22px;
   padding: 22px;
@@ -1136,14 +1265,14 @@ main {
 
 .company-type {
   color: var(--color-primary);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .company-list-identity h2 {
   margin: 2px 0 0;
   overflow: hidden;
-  font-size: 19px;
+  font-size: 21px;
   line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1155,7 +1284,7 @@ main {
   gap: 5px;
   margin: 6px 0 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .company-list-opportunity,
@@ -1168,7 +1297,7 @@ main {
 
 .company-list-opportunity > strong {
   overflow: hidden;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1180,7 +1309,7 @@ main {
   align-items: center;
   gap: 5px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .company-list-source > span svg {
@@ -1191,7 +1320,7 @@ main {
   max-width: 100%;
   overflow: hidden;
   color: #4c5a72;
-  font-size: 13px;
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1218,7 +1347,7 @@ main {
   justify-content: center;
   gap: 7px;
   color: var(--color-primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -2500,7 +2629,7 @@ main {
   padding: 5px 10px;
   border: 0;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -2699,7 +2828,7 @@ main {
 
 @media (max-width: 760px) {
   .shell {
-    width: min(100% - 32px, 1180px);
+    width: min(100% - 32px, 1300px);
   }
 
   .header-inner {
@@ -2717,7 +2846,7 @@ main {
   }
 
   .home-hero-copy h1 {
-    font-size: clamp(30px, 8.5vw, 34px);
+    font-size: clamp(32px, 8.5vw, 36px);
     line-height: 1.12;
   }
 
@@ -2800,6 +2929,14 @@ main {
 
   .opportunity-card {
     min-height: 310px;
+  }
+
+  .opportunity-grid .opportunity-card:nth-of-type(n + 6) {
+    display: none;
+  }
+
+  .company-filter-summary {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .insight-grid {
@@ -2954,7 +3091,7 @@ main {
 
 @media (max-width: 420px) {
   .shell {
-    width: min(100% - 24px, 1180px);
+    width: min(100% - 24px, 1300px);
   }
 
   .metric-strip article {

@@ -34,7 +34,7 @@ export function SiteHeader() {
           ))}
           <Link className="nav-feedback" href="/about#feedback">
             <MessageSquareText size={16} />
-            反馈信息
+            提交线索
           </Link>
         </nav>
         <details className="mobile-nav">
@@ -47,7 +47,7 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <Link href="/about#feedback">反馈信息</Link>
+            <Link href="/about#feedback">提交线索</Link>
           </nav>
         </details>
       </div>

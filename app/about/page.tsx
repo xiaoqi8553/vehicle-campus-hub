@@ -71,7 +71,7 @@ export default function AboutPage() {
       <section className="about-story-grid">
         <div className="about-story-copy">
           <p className="page-kicker">为谁服务</p>
-          <h2>给正在寻找车辆行业方向的你</h2>
+          <h2>面向车辆行业方向同学的信息服务</h2>
           <p>
             我们关注整车、新势力、自动驾驶、三电、电池、热管理、零部件与智能化供应商，优先帮助专业方向明确、但信息渠道分散的学生建立自己的企业清单。
           </p>

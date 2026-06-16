@@ -2,16 +2,20 @@ import { expect, test } from "@playwright/test";
 
 test("homepage is a compact public opportunity dashboard", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "更快找到适合你的车企机会" })).toBeVisible();
-  await expect(page.getByText("2027 届车辆行业校招", { exact: true })).toBeVisible();
-  await expect(page.getByTestId("home-opportunity")).toHaveCount(3);
+  await expect(
+    page.getByRole("heading", { name: "车辆行业 2027 届校招信息汇总" }),
+  ).toBeVisible();
+  await expect(page.getByText("2027 届", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("home-opportunity")).toHaveCount(6);
   await expect(page.getByRole("link", { name: "查看全部企业" })).toBeVisible();
-  await expect(page.getByText("每条机会，都说明信息从哪里来")).toBeVisible();
+  await expect(page.getByText("每条招聘入口都保留来源和核验时间")).toBeVisible();
 });
 
 test("company database supports search and detail navigation", async ({ page }) => {
   await page.goto("/companies");
-  await expect(page.getByRole("heading", { name: "寻找适合你的车辆企业" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "车辆行业 2027 届公司机会库" }),
+  ).toBeVisible();
   await expect(page.getByTestId("company-row")).toHaveCount(25);
 
   await page.getByRole("searchbox", { name: "搜索公司、技术方向或城市" }).fill("小米");

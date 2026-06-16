@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CalendarClock, CalendarX2, CheckCircle2, Eye } from "lucide-react";
 import { CompanyLinkAction } from "@/components/company/company-link";
+import { CompanyLogo } from "@/components/company/company-logo";
 import { DataState } from "@/components/ui/data-state";
 import { PageHero } from "@/components/ui/page-hero";
 import { getCompanies } from "@/lib/data";
@@ -114,7 +115,7 @@ export default async function CalendarPage() {
                 key={program.id}
               >
                 <div className="undated-opportunity-top">
-                  <span className="company-avatar">{company.shortName.slice(0, 1)}</span>
+                  <CompanyLogo name={company.name} logo={company.logo} />
                   <span className="undated-label">截止日期未公布</span>
                 </div>
                 <h3>{company.name}</h3>

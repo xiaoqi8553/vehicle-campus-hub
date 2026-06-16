@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { companyLogoPath } from "../lib/company-logos";
 import { stringifyStringList } from "../lib/domain";
 
 const prisma = new PrismaClient();
@@ -584,6 +585,7 @@ async function main() {
         slug: item.id,
         name: item.name,
         shortName: item.shortName,
+        logo: companyLogoPath(item.id),
         type: item.type,
         category: item.type,
         description: description(item),

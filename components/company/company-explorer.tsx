@@ -55,6 +55,34 @@ export function CompanyExplorer({
       ),
     [companies],
   );
+  const directionCounts = useMemo(
+    () =>
+      JOB_DIRECTIONS.map((item) => ({
+        name: item,
+        count: companies.filter((company) => company.vehicleDirections.includes(item)).length,
+      })).filter((item) => item.count > 0),
+    [companies],
+  );
+  const stats = useMemo(() => {
+    const open = companies.filter(
+      (company) =>
+        company.recruitments?.some(
+          (item) =>
+            item.targetYear === 2027 && item.sourceLink && isCohortEvidence(item.sourceLink, 2027),
+        ) ?? false,
+    ).length;
+    const verified = companies.filter(
+      (company) =>
+        company.links?.some((link) => link.isPrimary && isUsableLinkEvidence(link)) ?? false,
+    ).length;
+    const pending = companies.filter((company) => company.dataStatus.includes("待")).length;
+    return {
+      open,
+      verified,
+      pending,
+      unavailable: Math.max(0, companies.length - verified),
+    };
+  }, [companies]);
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -121,6 +149,24 @@ export function CompanyExplorer({
   return (
     <div className="company-explorer" data-testid="company-explorer">
       <div className="company-filter-panel">
+        <div className="company-filter-summary" aria-label="机会状态统计">
+          <span>
+            <strong>{stats.open}</strong>
+            正在招聘
+          </span>
+          <span>
+            <strong>{stats.verified}</strong>
+            入口已核验
+          </span>
+          <span>
+            <strong>{stats.pending}</strong>
+            待确认
+          </span>
+          <span>
+            <strong>{stats.unavailable}</strong>
+            暂无可用入口
+          </span>
+        </div>
         <label className="search-field">
           <Search size={18} />
           <input
@@ -131,6 +177,20 @@ export function CompanyExplorer({
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
+        <div className="direction-quick-filter" aria-label="车辆方向快捷筛选">
+          <span>车辆方向</span>
+          {directionCounts.slice(0, 10).map((item) => (
+            <button
+              className={direction === item.name ? "active" : ""}
+              key={item.name}
+              type="button"
+              onClick={() => setDirection(direction === item.name ? "" : item.name)}
+            >
+              {item.name}
+              <small>{item.count}</small>
+            </button>
+          ))}
+        </div>
         <div className="filter-grid">
           <label>
             <span>公司类型</span>

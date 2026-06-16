@@ -29,8 +29,8 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
       <div className="shell page-space">
         <PageHero
           eyebrow="公司机会"
-          title="寻找适合你的车辆企业"
-          description="按技术方向、公司类型和当前招聘状态筛选。明确开放的 2027 届项目优先展示，通用招聘入口不会被当作已开放项目。"
+          title="车辆行业 2027 届公司机会库"
+          description="按车辆方向、公司类型和招聘入口状态筛选。明确开放的 2027 届项目优先展示，通用招聘入口不会被当作已开放项目。"
           aside={
             <div className="page-stat-pills">
               <span>

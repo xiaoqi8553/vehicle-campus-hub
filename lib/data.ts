@@ -12,6 +12,7 @@ import {
   parseStringList,
   safeExternalUrl,
 } from "@/lib/domain";
+import { companyLogoPath } from "@/lib/company-logos";
 import { prisma } from "@/lib/prisma";
 
 export type CompanyBaseData = ReturnType<typeof serializeCompany>;
@@ -53,6 +54,7 @@ export function serializeCompany(company: Company) {
     ...company,
     slug: company.slug || company.id,
     shortName: company.shortName || company.name,
+    logo: company.logo || companyLogoPath(company.slug || company.id),
     type: companyType,
     category: companyType,
     recruitmentWebsite,
