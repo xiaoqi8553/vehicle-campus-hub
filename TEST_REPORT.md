@@ -58,7 +58,22 @@
 - 实现分支：`codex/public-website-redesign-impl`
 - 开发基线：`d5b63b2`
 - 本地完成时间：2026-06-13 11:52:56 +08:00
-- PR、最终 commit、Vercel Deployment 和生产 smoke 结果将在合并部署后补充。
+- PR：[#14](https://github.com/xiaoqi8553/vehicle-campus-hub/pull/14)
+- 最终生产 commit：`e176d10830e26831c976217082b5298ddfbfae86`
+- 生产 URL：<https://vehicle-campus-hub.vercel.app>
+- Vercel Deployment：<https://vehicle-campus-gwbem4f9m-xiaoqi8553f-1172s-projects.vercel.app>
+- 部署标签：`deploy-20260613-0406-e176d10`
+- 部署完成时间：2026-06-13 12:06:34 +08:00
+- Production Smoke：通过，<https://github.com/xiaoqi8553/vehicle-campus-hub/actions/runs/27456011094>
+- 线上复核时间：2026-06-16 15:43:45 +08:00
+- 线上健康检查：`/api/health` 返回 commit `e176d10830e26831c976217082b5298ddfbfae86`，environment `production`。
+- 本地线上 smoke 复核：2026-06-16 15:50:28 +08:00 通过；6 个核心路由 HTTP 200、`/admin` 404、无横向滚动、无无效链接。
+
+### 维护巡检修复
+
+- 发现 2026-06-15 的 Scheduled Maintenance 失败，原因是 `scripts/audit-production-links.ts` 使用顶层 `await`，在 CI 的 `tsx`/CJS 转换下报错。
+- 已将脚本改为 `main().catch(...)` 入口，并改用原生 `fetch` 读取公司 API，浏览器仍用于真实外链访问。
+- 本地验证：`AUDIT_BASE_URL=http://127.0.0.1:3100 npx tsx scripts/audit-production-links.ts` 通过，25 家企业、64 条外链，结果为 27 reachable / 33 redirected / 4 failed。
 
 ## 2026-06-11 工程治理与 PostgreSQL 迁移
 

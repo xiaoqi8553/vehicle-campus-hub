@@ -77,7 +77,8 @@ test("platform resources have real internal reading pages", async ({ page }) => 
   const firstResource = page.getByTestId("resource-row").first();
   const readLink = firstResource.getByRole("link", { name: /阅读完整指南/ });
   await expect(readLink).toBeVisible();
-  await Promise.all([page.waitForURL(/\/resources\/[^/]+$/), readLink.click()]);
+  await readLink.click();
+  await expect(page).toHaveURL(/\/resources\/[^/]+$/);
   await expect(page.getByRole("navigation", { name: "文章目录" })).toBeVisible();
   expect(await page.locator("article section").count()).toBeGreaterThanOrEqual(3);
 });
