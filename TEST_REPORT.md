@@ -74,6 +74,14 @@
 - 发现 2026-06-15 的 Scheduled Maintenance 失败，原因是 `scripts/audit-production-links.ts` 使用顶层 `await`，在 CI 的 `tsx`/CJS 转换下报错。
 - 已将脚本改为 `main().catch(...)` 入口，并改用原生 `fetch` 读取公司 API，浏览器仍用于真实外链访问。
 - 本地验证：`AUDIT_BASE_URL=http://127.0.0.1:3100 npx tsx scripts/audit-production-links.ts` 通过，25 家企业、64 条外链，结果为 27 reachable / 33 redirected / 4 failed。
+- PR：[#15](https://github.com/xiaoqi8553/vehicle-campus-hub/pull/15)
+- 合并 commit：`264cecbbd5d1503ab6d8a8c21cc9c40e57a12a1c`
+- 生产部署：<https://vehicle-campus-gospw0t8n-xiaoqi8553f-1172s-projects.vercel.app>
+- Vercel Deployment ID：`dpl_FLRMkhEvDSsb5ujZeKuy6YWLenrj`
+- 部署标签：`deploy-20260616-0853-264cecb`
+- 部署完成时间：2026-06-16 16:53:37 +08:00
+- 线上 smoke：2026-06-16 16:53:56 +08:00 通过；6 个核心路由 HTTP 200、`/admin` 404、无横向滚动、无无效链接。
+- 说明：GitHub Actions `verify-production` 当前因仓库 `VERCEL_TOKEN` secret 失效失败；本次已使用本机 Vercel CLI 登录态完成生产部署。长期修复需要在 Vercel Account Tokens 页面创建新的 user token 并更新 GitHub secret。
 
 ## 2026-06-11 工程治理与 PostgreSQL 迁移
 
