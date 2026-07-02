@@ -31,7 +31,7 @@
     "test:smoke": "tsx scripts/production-smoke.ts"
   },
   "overrides": {
-    "postcss": "8.5.15"
+    "postcss": "8.5.16"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -42,23 +42,23 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.2",
+    "@commitlint/cli": "^21.2.0",
     "@commitlint/config-conventional": "^21.0.2",
-    "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.2",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.0",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.5.0",
-    "eslint": "^9.39.4",
-    "eslint-config-next": "^15.5.19",
-    "pg": "^8.21.0",
-    "postcss": "8.5.15",
-    "prettier": "^3.8.4",
-    "prisma": "^6.19.3",
-    "tailwindcss": "^3.4.19",
+    "autoprefixer": "^10.5.2",
+    "eslint": "^10.6.0",
+    "eslint-config-next": "^16.2.10",
+    "pg": "^8.22.0",
+    "postcss": "8.5.16",
+    "prettier": "^3.9.4",
+    "prisma": "^7.8.0",
+    "tailwindcss": "^4.3.2",
     "tsx": "^4.22.4",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.8"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
