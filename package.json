@@ -31,7 +31,7 @@
     "test:smoke": "tsx scripts/production-smoke.ts"
   },
   "overrides": {
-    "postcss": "8.5.15"
+    "postcss": "8.5.23"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -53,7 +53,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.19",
     "pg": "^8.21.0",
-    "postcss": "8.5.15",
+    "postcss": "8.5.23",
     "prettier": "^3.8.4",
     "prisma": "^6.19.3",
     "tailwindcss": "^3.4.19",
